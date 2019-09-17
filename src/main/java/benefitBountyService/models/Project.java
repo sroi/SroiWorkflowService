@@ -1,6 +1,8 @@
 package benefitBountyService.models;
 
 import java.util.Date;
+import java.util.List;
+
 import benefitBountyService.user.IUser;
 import benefitBountyService.user.IAdmin;
 import org.bson.types.ObjectId;
@@ -12,21 +14,23 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Project {
 
 	@Id
+	@Field("_id")
 	private ObjectId projectId;
 	private String name;
 	private String areaOfEngagement;
 	private String summary;
-	private Date   startDate;
-	private Date   endDate;
+	private Date startDate;
+	private Date endDate;
 	private Double budget;
 	@Field("corporate")
 	private String associatedCorporateEntity;
 	private String location;
-	//private IUser  pointOfContact;
+	private List<User> stakeholders;
+	private List<User> pointOfContacts;
 	//private IAdmin admin;
 
-	public ObjectId getProjectId() {
-		return projectId;
+	public String getProjectId() {
+		return projectId.toString();
 	}
 
 	public String getName() {
@@ -91,5 +95,21 @@ public class Project {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public List<User> getStakeholders() {
+		return stakeholders;
+	}
+
+	public void setStakeholders(List<User> stakeholders) {
+		this.stakeholders = stakeholders;
+	}
+
+	public List<User> getPointOfContacts() {
+		return pointOfContacts;
+	}
+
+	public void setPointOfContacts(List<User> pointOfContacts) {
+		this.pointOfContacts = pointOfContacts;
 	}
 }

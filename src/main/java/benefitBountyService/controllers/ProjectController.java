@@ -1,9 +1,11 @@
 package benefitBountyService.controllers;
 
 import benefitBountyService.models.Project;
+import benefitBountyService.models.Task;
 import benefitBountyService.services.ProjectService;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +38,32 @@ public class ProjectController {
         }
     }
 	
-	@RequestMapping(value = "/getAll" , method=RequestMethod.GET)
+	@RequestMapping(value = "/all" , method=RequestMethod.GET)
 	public List<Project> getProjects(){
         List<Project> projects = projectService.getProjects();
         return projects;
+    }
+
+    /**
+     * Description - To find list of tasks satisfying given projectId condition.
+     * Param - Project_id (in String format)
+     * Return Value -  Return list of tasks
+     */
+    @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
+    public List<Task> getTasksDetailsByProject(@RequestParam("pr_id") String projectId){
+        List<Task> tasks = projectService.getTasksDetailsByProject(projectId);
+        return tasks;
+    }
+
+    /**
+     * Description - To find list of tasks satisfying given task name condition.
+     * Param - task_name (in String format)
+     * Return Value -  Return list of tasks
+     */
+    @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
+    public List<Task> getTasksDetailsByName(@RequestParam("t_name") String taskName){
+        List<Task> tasks = projectService.getTasksDetailsByName(taskName);
+        return tasks;
     }
 	
 	
