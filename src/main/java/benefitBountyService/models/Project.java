@@ -22,8 +22,8 @@ public class Project {
 	private Date startDate;
 	private Date endDate;
 	private Double budget;
-	@Field("corporate")
-	private String associatedCorporateEntity;
+	//@Field("corporate")
+	private String corporate;
 	private String location;
 	private List<User> stakeholders;
 	private List<User> pointOfContacts;
@@ -31,6 +31,10 @@ public class Project {
 
 	public String getProjectId() {
 		return projectId.toString();
+	}
+
+	public void setProjectId(ObjectId projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getName() {
@@ -81,12 +85,12 @@ public class Project {
 		this.budget = budget;
 	}
 
-	public String getAssociatedCorporateEntity() {
-		return associatedCorporateEntity;
+	public String getCorporate() {
+		return corporate;
 	}
 
-	public void setAssociatedCorporateEntity(String associatedCorporateEntity) {
-		this.associatedCorporateEntity = associatedCorporateEntity;
+	public void setCorporate(String corporate) {
+		this.corporate = corporate;
 	}
 
 	public String getLocation() {
@@ -111,5 +115,22 @@ public class Project {
 
 	public void setPointOfContacts(List<User> pointOfContacts) {
 		this.pointOfContacts = pointOfContacts;
+	}
+
+	@Override
+	public String toString() {
+		return "Project{" +
+				"projectId=" + projectId +
+				", name='" + name + '\'' +
+				", areaOfEngagement='" + areaOfEngagement + '\'' +
+				", summary='" + summary + '\'' +
+				", startDate=" + startDate +
+				", endDate=" + endDate +
+				", budget=" + budget +
+				", associatedCorporateEntity='" + corporate + '\'' +
+				", location='" + location + '\'' +
+				", stakeholders=" + stakeholders +
+				", pointOfContacts=" + pointOfContacts +
+				'}';
 	}
 }

@@ -35,4 +35,17 @@ public class ProjectService {
         List<Task> tasks = taskRepository.findByProjectId(projectId);
         return tasks;
     }
+
+    public int saveProject(Project project) {
+        int returnVal = 1;
+        project.setProjectId(ObjectId.get());
+        System.out.println("Following object has been obtained: "+project);
+        System.out.println("************************");
+        Project proj = projectRepository.save(project);
+        System.out.println("Following project has been saved successfully: \\n"+proj);
+        //return project;
+        if (proj != null)
+            returnVal = 0;
+        return returnVal;
+    }
 }

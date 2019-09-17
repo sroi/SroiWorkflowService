@@ -8,15 +8,13 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
@@ -64,6 +62,17 @@ public class ProjectController {
     public List<Task> getTasksDetailsByName(@RequestParam("t_name") String taskName){
         List<Task> tasks = projectService.getTasksDetailsByName(taskName);
         return tasks;
+    }
+
+    /**
+     * Description - To find list of tasks satisfying given task name condition.
+     * Param - task_name (in String format)
+     * Return Value -  Return list of tasks
+     */
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+
+    public int addProject(@RequestBody Project project){
+        return projectService.saveProject(project);
     }
 	
 	

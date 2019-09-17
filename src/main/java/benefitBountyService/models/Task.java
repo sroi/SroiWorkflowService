@@ -30,8 +30,8 @@ public class Task {
     private String updatedBy;
     private Date updatedTime;
 
-    public ObjectId getTaskId() {
-        return taskId;
+    public String getTaskId() {
+        return taskId.toString();
     }
 
     public void setTaskId(ObjectId taskId) {
@@ -140,5 +140,25 @@ public class Task {
 
     public void setUpdatedTime(Timestamp updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "taskId=" + taskId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", activityLabel='" + activityLabel + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", location='" + location + '\'' +
+                ", approver=" + approver +
+                ", volunteers=" + volunteers +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", updatedTime=" + updatedTime +
+                '}';
     }
 }
