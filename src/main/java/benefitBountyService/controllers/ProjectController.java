@@ -67,18 +67,37 @@ public class ProjectController {
     }
 
     /**
-     * Description - To find list of tasks satisfying given task name condition.
-     * Param - task_name (in String format)
-     * Return Value -  Return list of tasks
+     * Description - To create new projects.
+     * Param - project object
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-
     public int addProject(@RequestBody Project project){
-        return projectService.saveProject(project);
+        return projectService.createProject(project);
     }
-	
-	
-//	@RequestMapping(value="/" , method=POST)
-//	public void createProject(@RequestParam)
+
+    /**
+     * Description - To delete existing project.
+     * Param - Project_id (in String format)
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public int deleteProject(@RequestParam("pr_id") String projectId){
+        return projectService.deleteProject(projectId);
+    }
+
+    /**
+     * Description - To create new projects.
+     * Param - project object
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed
+     */
+    @RequestMapping(value = "/createTask", method = RequestMethod.POST)
+    public int addTask(@RequestBody Task task){
+        return projectService.createTask(task);
+    }
+
 
 }
