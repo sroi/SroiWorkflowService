@@ -1,14 +1,13 @@
 package benefitBountyService.models;
 
-import java.util.Date;
-import java.util.List;
-
-import benefitBountyService.user.IUser;
-import benefitBountyService.user.IAdmin;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Date;
+import java.util.List;
 
 @Document(collection = "projects")
 public class Project {
@@ -22,11 +21,13 @@ public class Project {
 	private Date startDate;
 	private Date endDate;
 	private Double budget;
-	//@Field("corporate")
-	private String corporate;
+	@Field("corporate")
+	@JsonSetter("corporate")
+	private String associatedCorporateEntity;
 	private String location;
 	private List<User> stakeholders;
 	private List<User> pointOfContacts;
+	private String status;
 	//private IAdmin admin;
 
 	public String getProjectId() {
@@ -86,11 +87,11 @@ public class Project {
 	}
 
 	public String getCorporate() {
-		return corporate;
+		return associatedCorporateEntity;
 	}
 
 	public void setCorporate(String corporate) {
-		this.corporate = corporate;
+		this.associatedCorporateEntity = corporate;
 	}
 
 	public String getLocation() {
@@ -117,6 +118,14 @@ public class Project {
 		this.pointOfContacts = pointOfContacts;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "Project{" +
@@ -127,10 +136,11 @@ public class Project {
 				", startDate=" + startDate +
 				", endDate=" + endDate +
 				", budget=" + budget +
-				", associatedCorporateEntity='" + corporate + '\'' +
+				", associatedCorporateEntity='" + associatedCorporateEntity + '\'' +
 				", location='" + location + '\'' +
 				", stakeholders=" + stakeholders +
 				", pointOfContacts=" + pointOfContacts +
+				", status='" + status + '\'' +
 				'}';
 	}
 }

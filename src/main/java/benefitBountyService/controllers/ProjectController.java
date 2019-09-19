@@ -4,6 +4,7 @@ import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
 import benefitBountyService.services.ProjectService;
+import benefitBountyService.services.TaskService;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -22,6 +23,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private TaskService taskService;
 
     @RequestMapping("/ping")
     public String getProjectControllerStatus(){
@@ -44,13 +48,30 @@ public class ProjectController {
     }
 
     /**
+     * Description - To find task details for given taskId.
+     * Param - tid (in String format)
+     * Return Value -  Return task details
+     */
+    @RequestMapping(value = "/get" , method=RequestMethod.GET)
+    public Project getProjectDetailsByProjectId(@RequestParam("pid") String projectId) {
+        Project project = null;
+        try {
+            project = projectService.getProjectDetailsById(projectId);
+            return project;
+        } catch (ResourceNotFoundException e) {
+//            System.out.println("catch (TaskNotFoundException e)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide correct project Id", e);
+        }
+    }
+
+    /**
      * Description - To find list of tasks satisfying given projectId condition.
      * Param - Project_id (in String format)
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
     public List<Task> getTasksDetailsByProject(@RequestParam("pid") String projectId){
-        List<Task> tasks = projectService.getTasksDetailsByProject(projectId);
+        List<Task> tasks = taskService.getTasksDetailsByProject(projectId);
         return tasks;
     }
 
@@ -63,7 +84,7 @@ public class ProjectController {
     public Task getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
         Task task = null;
         try {
-            task = projectService.getTaskDetailsById(taskId);
+            task = taskService.getTaskDetailsById(taskId);
             return task;
         } catch (ResourceNotFoundException e) {
 //            System.out.println("catch (TaskNotFoundException e)");
@@ -78,7 +99,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
     public List<Task> getTasksDetailsByName(@RequestParam("tname") String taskName){
-        List<Task> tasks = projectService.getTasksDetailsByName(taskName);
+        List<Task> tasks = taskService.getTasksDetailsByName(taskName);
         return tasks;
     }
 
@@ -101,7 +122,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/createTask", method = RequestMethod.POST)
     public int addTask(@RequestBody Task task){
-        return projectService.createTask(task);
+        return taskService.createTask(task);
     }
 
     /**
@@ -125,9 +146,19 @@ public class ProjectController {
      */
     @RequestMapping(value = "/deleteTask", method = RequestMethod.DELETE)
     public int deleteTask(@RequestParam("tid") String taskId){
-        return projectService.deleteTask(taskId);
+        return taskService.deleteTask(taskId);
     }
 
-
+    /**
+     * Description - To update project status.
+     * Param - Project Id (in String format)
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed- Task not found. Please refresh Task table.
+     *                     -> 2 - failed- Task can not be deleted. It is in <state> state.
+     */
+    @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
+    public boolean updateProjectStatus(@RequestParam("pid") String projectId, @RequestParam("status") String status){
+        return projectService.updateProjectStatus(projectId, status);
+    }
 
 }
