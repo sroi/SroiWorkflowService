@@ -2,20 +2,23 @@ package benefitBountyService.services;
 
 import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.dao.TaskRepository;
+import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
+import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProjectService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -25,14 +28,22 @@ public class ProjectService {
 
     public List<Project> getProjects(){
 //        Todo : get projects depending upon roles
-        return projectRepository.findAll();
+        List<Project> projects = null;
+        try {
+            projects = projectRepository.findAll();
+            if (projects.isEmpty())
+                logger.info("collection 'projects' is empty. Please load some data through 'Create Project' page");
+        } catch (MongoException ex) {
+            logger.error("Failure while loading projects in Mongo. {}");
+        }
+        return projects;
     }
 
     public boolean getProjectById(String projectId){
         boolean found = false;
         Optional<Project> prjOpnl = projectRepository.findById(projectId);
         if (prjOpnl.isPresent()){
-            System.out.println("Below are project details: "+prjOpnl.get());
+            logger.info("Below are project details: "+prjOpnl.get());
             found = true;
         }
         /*prjOpnl.ifPresent( prj -> {
@@ -46,19 +57,36 @@ public class ProjectService {
         boolean found = false;
         Optional<Task> tskOpnl = taskRepository.findById(taskId);
         if (tskOpnl.isPresent()){
-            System.out.println("Below are Task details: "+tskOpnl.get());
+            logger.info("Below are Task details: "+ tskOpnl.get());
             found = true;
         }
         return found;
     }
 
+    public Task getTaskDetailsById(String taskId) throws ResourceNotFoundException {
+        Task task = null;
+        Optional<Task> tskOpnl = taskRepository.findById(taskId);
+        if (tskOpnl.isPresent()){
+            task = tskOpnl.get();
+            logger.info("Below are Task details: "+ task);
+        } else {
+            logger.warn("Task with id '" + taskId + "' is not present.");
+            throw new ResourceNotFoundException();
+        }
+        return task;
+    }
+
     public List<Task> getTasksDetailsByName(String name) {
         List<Task> tasks = taskRepository.findByName(name);
+        if(tasks.isEmpty())
+            logger.info("Task with name '"+ name +"' doesn't exist.");
         return tasks;
     }
 
     public List<Task> getTasksDetailsByProject(String projectId) {
         List<Task> tasks = taskRepository.findByProjectId(projectId);
+        if (tasks.isEmpty())
+            logger.info("Provided project doesn't have tasks created.");
         return tasks;
     }
 
@@ -69,11 +97,11 @@ public class ProjectService {
 //        projectRepository.deleteById(projectId);
 //        foundProject = getProjectById(projectId);
         if(foundProject){
-            System.out.println("Project found");
+            logger.info("Delting project with id '" + projectId + "'.");
             projectRepository.deleteById(projectId);
             return 0; // successful deletion
         } else {
-            System.out.println("Project not found. Please refresh Project table");
+            logger.info("Project with id '"+ projectId + "'not found.");
             return 1; // failed- Project not found. Please refresh Project table.
         }
         //return 2; failed- Project can not be deleted. It is in <state> state.
@@ -86,11 +114,11 @@ public class ProjectService {
 //        projectRepository.deleteById(projectId);
 //        foundProject = getProjectById(projectId);
         if(foundTask){
-            System.out.println("Task found");
+            logger.info("Deleting task with id '" + taskId + "'.");
             taskRepository.deleteById(taskId);
             return 0; // successful deletion
         } else {
-            System.out.println("Task not found. Please refresh Project table");
+            logger.info("Task with id '" + taskId + "' is not present.");
             return 1; // failed- Task not found. Please refresh Task table.
         }
         //return 2; failed- Task can not be deleted. It is in <state> state.
@@ -99,10 +127,9 @@ public class ProjectService {
     public int createProject(Project project) {
         int returnVal = 1;
         project.setProjectId(ObjectId.get());
-        System.out.println("Following object has been obtained: "+project);
-        System.out.println("************************");
+        logger.info("Following project has been recieved from User: "+project);
         Project proj = projectRepository.save(project);
-        System.out.println("Following project has been saved successfully: \\n"+proj);
+        logger.info("Following project has been saved successfully: \\n"+proj);
         //return project;
         if (proj != null)
             returnVal = 0;
@@ -112,15 +139,13 @@ public class ProjectService {
     public int createTask(Task task) {
         int returnVal = 1;
         task.setTaskId(ObjectId.get());
-        System.out.println("Following object has been obtained: "+task);
-        System.out.println("************************");
+        logger.info("Following object has been obtained: "+task);
         Task savedTask = taskRepository.save(task);
-        System.out.println("Following project has been saved successfully: \\n"+savedTask);
+        logger.info("Following project has been saved successfully: \\n"+savedTask);
         //return project;
         if (savedTask != null)
             returnVal = 0;
         return returnVal;
     }
-
 
 }
