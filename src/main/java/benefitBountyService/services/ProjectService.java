@@ -91,9 +91,9 @@ public class ProjectService {
             return 0; // successful deletion
         } else {
             System.out.println("Task not found. Please refresh Project table");
-            return 1; // failed- Project not found. Please refresh Project table.
+            return 1; // failed- Task not found. Please refresh Task table.
         }
-        //return 2; failed- Project can not be deleted. It is in <state> state.
+        //return 2; failed- Task can not be deleted. It is in <state> state.
     }
 
     public int createProject(Project project) {

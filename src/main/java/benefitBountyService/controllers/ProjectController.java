@@ -50,18 +50,18 @@ public class ProjectController {
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
-    public List<Task> getTasksDetailsByProject(@RequestParam("pr_id") String projectId){
+    public List<Task> getTasksDetailsByProject(@RequestParam("pid") String projectId){
         List<Task> tasks = projectService.getTasksDetailsByProject(projectId);
         return tasks;
     }
 
     /**
-     * Description - To find list of tasks satisfying given task name condition.
+     * Description - To find list of tasks satisfying given task name.
      * Param - task_name (in String format)
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
-    public List<Task> getTasksDetailsByName(@RequestParam("t_name") String taskName){
+    public List<Task> getTasksDetailsByName(@RequestParam("tname") String taskName){
         List<Task> tasks = projectService.getTasksDetailsByName(taskName);
         return tasks;
     }
@@ -78,19 +78,8 @@ public class ProjectController {
     }
 
     /**
-     * Description - To delete existing project.
-     * Param - Project_id (in String format)
-     * Return Value -  int -> 0 - success
-     *                     -> 1 - failed
-     */
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public int deleteProject(@RequestParam("pr_id") String projectId){
-        return projectService.deleteProject(projectId);
-    }
-
-    /**
-     * Description - To create new projects.
-     * Param - project object
+     * Description - To create new task.
+     * Param - task object
      * Return Value -  int -> 0 - success
      *                     -> 1 - failed
      */
@@ -99,5 +88,28 @@ public class ProjectController {
         return projectService.createTask(task);
     }
 
+    /**
+     * Description - To delete existing project.
+     * Param - Project_id (in String format)
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed- Task not found. Please refresh Project table.
+     *                     -> 2 - failed- Project can not be deleted. It is in <state> state.
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public int deleteProject(@RequestParam("pid") String projectId){
+        return projectService.deleteProject(projectId);
+    }
+
+    /**
+     * Description - To delete existing task.
+     * Param - Task (in String format)
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed- Task not found. Please refresh Task table.
+     *                     -> 2 - failed- Task can not be deleted. It is in <state> state.
+     */
+    @RequestMapping(value = "/deleteTask", method = RequestMethod.DELETE)
+    public int deleteTask(@RequestParam("tid") String taskId){
+        return projectService.deleteTask(taskId);
+    }
 
 }

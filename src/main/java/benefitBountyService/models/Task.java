@@ -1,6 +1,8 @@
 package benefitBountyService.models;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -19,6 +21,7 @@ public class Task {
     private String description;
     private String projectId;
     @Field("label")
+    @JsonSetter("label")
     private String activityLabel;
     private Date startDate;
     private Date endDate;
@@ -66,7 +69,7 @@ public class Task {
         return activityLabel;
     }
 
-    public void setActivityLabel(String activityLabel) {
+    public void setLabel(String activityLabel) {
         this.activityLabel = activityLabel;
     }
 
