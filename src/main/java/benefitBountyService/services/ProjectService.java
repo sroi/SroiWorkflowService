@@ -2,6 +2,7 @@ package benefitBountyService.services;
 
 import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.exceptions.ResourceNotFoundException;
+import benefitBountyService.exceptions.SroiResourceNotFoundException;
 import benefitBountyService.models.Project;
 import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
@@ -40,7 +41,7 @@ public class ProjectService {
         boolean found = false;
         Optional<Project> prjOpnl = projectRepository.findById(projectId);
         if (prjOpnl.isPresent()){
-            logger.info("Below are project details: "+prjOpnl.get());
+            logger.info("Project found. Below are project details: "+prjOpnl.get());
             found = true;
         }
         /*prjOpnl.ifPresent( prj -> {
@@ -70,39 +71,48 @@ public class ProjectService {
 //        projectRepository.deleteById(projectId);
 //        foundProject = getProjectById(projectId);
         if(foundProject){
-            logger.info("Delting project with id '" + projectId + "'.");
+            logger.info("Deleting project with id '" + projectId + "'.");
             projectRepository.deleteById(projectId);
             return 0; // successful deletion
         } else {
-            logger.info("Project with id '"+ projectId + "'not found.");
-            return 1; // failed- Project not found. Please refresh Project table.
+            String errMsg = "Project with id '"+ projectId + "' is not found.";
+            //logger.info(errMsg);
+            throw new SroiResourceNotFoundException(errMsg);
+            //return 1; // failed- Project not found. Please refresh Project table.
         }
         //return 2; failed- Project can not be deleted. It is in <state> state.
     }
 
-    public int createProject(Project project) {
+    public int saveOrUpdate(Project project) {
         int returnVal = 1;
-        project.setProjectId(ObjectId.get());
-        logger.info("Following project has been recieved from User: "+project);
-        Project proj = projectRepository.save(project);
-        logger.info("Following project has been saved successfully: \\n"+proj);
+        logger.info("Following project details have been received from User: "+project);
+        // Todo : To remove checkProjectById(project.getProjectId() from below
+        // Todo: Logic for which fields to allow to be updated
+        if (project.getProjectId() != null && checkProjectById(project.getProjectId()))
+            logger.info("Updating existing project.");
+        else {
+            project.setProjectId(ObjectId.get());
+            logger.info("New Project will be created.");
+        }
+        Project savedProj = projectRepository.save(project);
+        logger.info("Following project has been saved successfully: \n"+savedProj);
         //return project;
-        if (proj != null)
+        if (savedProj != null)
             returnVal = 0;
         return returnVal;
     }
 
-    public boolean updateProjectStatus(String projectId, String status) {
-        boolean updated = false;
+    public int updateProjectStatus(String projectId, String status) {
+        int updated = 1;
         try {
             Project project = getProjectDetailsById(projectId);
             logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
             project.setStatus(status);
             projectRepository.save(project);
-            updated = true;
+            updated = 0;
         } catch (ResourceNotFoundException e) {
-            String errMsg = "Project not found with id '" + projectId+"'.";
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg, e);
+            String errMsg = "Project with id '" + projectId+"' not found.";
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errMsg, e);
         }
         return updated;
     }

@@ -1,5 +1,6 @@
 package benefitBountyService.controllers;
 
+import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
@@ -60,7 +61,7 @@ public class ProjectController {
             return project;
         } catch (ResourceNotFoundException e) {
 //            System.out.println("catch (TaskNotFoundException e)");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide correct project Id", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct project Id", e);
         }
     }
 
@@ -70,8 +71,15 @@ public class ProjectController {
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
-    public List<Task> getTasksDetailsByProject(@RequestParam("pid") String projectId){
-        List<Task> tasks = taskService.getTasksDetailsByProject(projectId);
+    public List<Task> getTasksDetailsByProject(@RequestParam("pid") String projectId) throws BadInputException{
+//        if (projectId == null)
+//            throw new BadInputException("Project Id");
+        List<Task> tasks = null;
+        try {
+            tasks = taskService.getTasksDetailsByProject(projectId);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct project Id.",e);
+        }
         return tasks;
     }
 
@@ -82,13 +90,15 @@ public class ProjectController {
      */
     @RequestMapping(value = "/task" , method=RequestMethod.GET)
     public Task getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
+        /*if (taskId == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task Id can not be empty");*/
         Task task = null;
         try {
             task = taskService.getTaskDetailsById(taskId);
             return task;
         } catch (ResourceNotFoundException e) {
 //            System.out.println("catch (TaskNotFoundException e)");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please provide correct task Id", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct task Id.", e);
         }
     }
 
@@ -99,7 +109,12 @@ public class ProjectController {
      */
     @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
     public List<Task> getTasksDetailsByName(@RequestParam("tname") String taskName){
-        List<Task> tasks = taskService.getTasksDetailsByName(taskName);
+        List<Task> tasks = null;
+        try{
+            tasks = taskService.getTasksDetailsByName(taskName);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide proper task name.", e);
+        }
         return tasks;
     }
 
@@ -111,7 +126,7 @@ public class ProjectController {
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public int addProject(@RequestBody Project project){
-        return projectService.createProject(project);
+        return projectService.saveOrUpdate(project);
     }
 
     /**
@@ -154,10 +169,10 @@ public class ProjectController {
      * Param - Project Id (in String format)
      * Return Value -  int -> 0 - success
      *                     -> 1 - failed- Task not found. Please refresh Task table.
-     *                     -> 2 - failed- Task can not be deleted. It is in <state> state.
+     *                     -> 2 - failed- Task can not be updated. It is in <state> state.
      */
     @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
-    public boolean updateProjectStatus(@RequestParam("pid") String projectId, @RequestParam("status") String status){
+    public int updateProjectStatus(@RequestParam("pid") String projectId, @RequestParam("status") String status){
         return projectService.updateProjectStatus(projectId, status);
     }
 

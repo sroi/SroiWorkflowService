@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -21,7 +22,20 @@ public class SROIExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({MongoException.class})
     public ResponseEntity<Object> handleMongoException(Exception ex, WebRequest request){
-        logger.info("Handling MongoException. "+ex.getMessage());
+        logger.error("Handling MongoException. "+ex.getMessage());
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED, request);
+    }
+
+    @ExceptionHandler({BadInputException.class})
+    public ResponseStatusException handleBadInputException(Exception ex, String input){
+        logger.error("Handling BadInputException. "+ex.getMessage());
+        String errMsg = input + " can not be empty.";
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, errMsg, ex);
+    }
+
+    @ExceptionHandler({SroiResourceNotFoundException.class})
+    public ResponseEntity<Object> handleResourceNotFoundException(Exception ex, WebRequest request){
+        logger.error("Handling SroiResourceNotFoundException. "+ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 }
