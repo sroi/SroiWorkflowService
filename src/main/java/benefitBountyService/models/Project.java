@@ -25,8 +25,8 @@ public class Project {
 	@JsonSetter("corporate")
 	private String associatedCorporateEntity;
 	private String location;
-	private List<User> stakeholders;
-	private List<User> pointOfContacts;
+	private String stakeholder;
+	private List<String> pointOfContacts;
 	private String status;
 	//private IAdmin admin;
 
@@ -102,19 +102,19 @@ public class Project {
 		this.location = location;
 	}
 
-	public List<User> getStakeholders() {
-		return stakeholders;
+	public String getStakeholder() {
+		return stakeholder;
 	}
 
-	public void setStakeholders(List<User> stakeholders) {
-		this.stakeholders = stakeholders;
+	public void setStakeholder(String stakeholder) {
+		this.stakeholder = stakeholder;
 	}
 
-	public List<User> getPointOfContacts() {
+	public List<String> getPointOfContacts() {
 		return pointOfContacts;
 	}
 
-	public void setPointOfContacts(List<User> pointOfContacts) {
+	public void setPointOfContacts(List<String> pointOfContacts) {
 		this.pointOfContacts = pointOfContacts;
 	}
 
@@ -138,7 +138,7 @@ public class Project {
 				", budget=" + budget +
 				", associatedCorporateEntity='" + associatedCorporateEntity + '\'' +
 				", location='" + location + '\'' +
-				", stakeholders=" + stakeholders +
+				", stakeholders=" + stakeholder +
 				", pointOfContacts=" + pointOfContacts +
 				", status='" + status + '\'' +
 				'}';

@@ -2,7 +2,6 @@ package benefitBountyService.models;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -26,8 +25,8 @@ public class Task {
     private Date startDate;
     private Date endDate;
     private String location;
-    private User approver;
-    private List<User> volunteers;
+    private String approver;
+    private List<String> volunteers;
     private String createdBy;
     private Date createdTime;
     private String updatedBy;
@@ -97,19 +96,19 @@ public class Task {
         this.location = location;
     }
 
-    public User getApprover() {
+    public String getApprover() {
         return approver;
     }
 
-    public void setApprover(User approver) {
+    public void setApprover(String approver) {
         this.approver = approver;
     }
 
-    public List<User> getVolunteers() {
+    public List<String> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(List<User> volunteers) {
+    public void setVolunteers(List<String> volunteers) {
         this.volunteers = volunteers;
     }
 

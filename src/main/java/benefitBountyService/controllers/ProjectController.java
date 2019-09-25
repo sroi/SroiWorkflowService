@@ -4,6 +4,7 @@ import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
+import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.services.ProjectService;
 import benefitBountyService.services.TaskService;
 import com.mongodb.MongoClient;
@@ -43,8 +44,8 @@ public class ProjectController {
     }
 	
 	@RequestMapping(value = "/all" , method=RequestMethod.GET)
-	public List<Project> getProjects() {
-        List<Project> projects = projectService.getProjects();
+	public List<ProjectTO> getProjects() {
+        List<ProjectTO> projects = projectService.getProjects();
         return projects;
     }
 

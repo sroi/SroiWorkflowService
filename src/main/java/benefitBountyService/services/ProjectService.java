@@ -4,6 +4,9 @@ import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.exceptions.SroiResourceNotFoundException;
 import benefitBountyService.models.Project;
+import benefitBountyService.models.User;
+import benefitBountyService.models.dtos.ProjectTO;
+import benefitBountyService.models.dtos.UserTO;
 import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -13,8 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -24,17 +30,49 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public List<Project> getProjects(){
+    @Autowired
+    private UserService userService;
+
+    public List<ProjectTO> getProjects(){
 //        Todo : get projects depending upon roles
         List<Project> projects = null;
+        List<ProjectTO> projectTOs = new ArrayList<>();
+        List<User> users = null;
+        logger.info("Retrieving projects...");
         try {
             projects = projectRepository.findAll();
+            users = userService.getUsers();
+            if (users.isEmpty()) {
+                logger.info("collection 'users' is empty.");
+            }
+            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
             if (projects.isEmpty())
                 logger.info("collection 'projects' is empty. Please load some data through 'Create Project' page");
+//            projectTOs = projects.stream().map(prj -> {
+            for (Project prj : projects) {
+                UserTO stHolder = null;
+                if (!prj.getStakeholder().equals(null)) {
+                    User sh = userMap.get(prj.getStakeholder());
+                    stHolder = new UserTO(sh.get_id(), sh.getName(), sh.getEmailId(), sh.getPhoneNo());
+                }
+
+                List<UserTO> pocs = new ArrayList<>();
+                if (!prj.getPointOfContacts().isEmpty()) {
+                    for (String poc : prj.getPointOfContacts()) {
+                        User pocUser = userMap.get(poc);
+                        pocs.add(new UserTO(pocUser.get_id(), pocUser.getName(), pocUser.getEmailId(), pocUser.getPhoneNo()));
+                    }
+                }
+                ProjectTO projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj
+                        .getEndDate(), prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocs, prj.getStatus());
+                projectTOs.add(projectTO);
+            }
+//            }).collect(Collectors.toList());
         } catch (MongoException ex) {
             logger.error("Failure while loading projects in Mongo. {}");
         }
-        return projects;
+        logger.info("Below are projects details..." + projectTOs);
+        return projectTOs;
     }
 
     public boolean checkProjectById(String projectId){
