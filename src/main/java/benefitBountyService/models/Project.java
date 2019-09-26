@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
-import java.util.List;
 
 @Document(collection = "projects")
 public class Project {
@@ -26,9 +25,26 @@ public class Project {
 	private String associatedCorporateEntity;
 	private String location;
 	private String stakeholder;
-	private List<String> pointOfContacts;
+	private String pointOfContacts;
 	private String status;
 	//private IAdmin admin;
+
+
+	public Project(ObjectId projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String associatedCorporateEntity,
+				   String location, String stakeholder, String pointOfContacts, String status) {
+		this.projectId = projectId;
+		this.name = name;
+		this.areaOfEngagement = areaOfEngagement;
+		this.summary = summary;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.budget = budget;
+		this.associatedCorporateEntity = associatedCorporateEntity;
+		this.location = location;
+		this.stakeholder = stakeholder;
+		this.pointOfContacts = pointOfContacts;
+		this.status = status;
+	}
 
 	public String getProjectId() {
 		return projectId.toString();
@@ -110,12 +126,12 @@ public class Project {
 		this.stakeholder = stakeholder;
 	}
 
-	public List<String> getPointOfContacts() {
+	public String getPointOfContacts() {
 		return pointOfContacts;
 	}
 
-	public void setPointOfContacts(List<String> pointOfContacts) {
-		this.pointOfContacts = pointOfContacts;
+	public void setPointOfContacts(String pointOfContact) {
+		this.pointOfContacts = pointOfContact;
 	}
 
 	public String getStatus() {

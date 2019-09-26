@@ -126,7 +126,7 @@ public class ProjectController {
      *                     -> 1 - failed
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public int addProject(@RequestBody Project project){
+    public int addProject(@RequestBody ProjectTO project){
         return projectService.saveOrUpdate(project);
     }
 

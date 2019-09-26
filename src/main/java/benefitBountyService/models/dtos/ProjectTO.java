@@ -1,7 +1,6 @@
 package benefitBountyService.models.dtos;
 
 import java.util.Date;
-import java.util.List;
 
 public class ProjectTO {
 
@@ -15,10 +14,11 @@ public class ProjectTO {
     private String corporate;
     private String location;
     private UserTO stakeholder;
-    private List<UserTO> pointOfContacts;
+    private UserTO pointOfContact;
     private String status;
 
-    public ProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location, UserTO stakeholder, List<UserTO> pointOfContacts, String status) {
+    public ProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location,
+                     UserTO stakeholder, UserTO pointOfContact, String status) {
         this.projectId = projectId;
         this.name = name;
         this.areaOfEngagement = areaOfEngagement;
@@ -29,7 +29,7 @@ public class ProjectTO {
         this.corporate = corporate;
         this.location = location;
         this.stakeholder = stakeholder;
-        this.pointOfContacts = pointOfContacts;
+        this.pointOfContact = pointOfContact;
         this.status = status;
     }
 
@@ -113,12 +113,12 @@ public class ProjectTO {
         this.stakeholder = stakeholder;
     }
 
-    public List<UserTO> getPointOfContacts() {
-        return pointOfContacts;
+    public UserTO getPointOfContact() {
+        return pointOfContact;
     }
 
-    public void setPointOfContacts(List<UserTO> pointOfContacts) {
-        this.pointOfContacts = pointOfContacts;
+    public void setPointOfContact(UserTO pointOfContact) {
+        this.pointOfContact = pointOfContact;
     }
 
     public String getStatus() {
@@ -142,7 +142,7 @@ public class ProjectTO {
                 ", corporate='" + corporate + '\'' +
                 ", location='" + location + '\'' +
                 ", stakeholder=" + stakeholder +
-                ", pointOfContacts=" + pointOfContacts +
+                ", pointOfContacts=" + pointOfContact +
                 ", status='" + status + '\'' +
                 '}';
     }

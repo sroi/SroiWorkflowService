@@ -56,15 +56,15 @@ public class ProjectService {
                     stHolder = new UserTO(sh.get_id(), sh.getName(), sh.getEmailId(), sh.getPhoneNo());
                 }
 
-                List<UserTO> pocs = new ArrayList<>();
-                if (!prj.getPointOfContacts().isEmpty()) {
-                    for (String poc : prj.getPointOfContacts()) {
-                        User pocUser = userMap.get(poc);
-                        pocs.add(new UserTO(pocUser.get_id(), pocUser.getName(), pocUser.getEmailId(), pocUser.getPhoneNo()));
-                    }
-                }
+//                List<UserTO> pocs = new ArrayList<>();
+//                if (!prj.getPointOfContacts().isEmpty()) {
+                    //for (String poc : prj.getPointOfContacts()) {
+                        User pocUser = userMap.get(prj.getPointOfContacts());
+                        UserTO pocTo = new UserTO(pocUser.get_id(), pocUser.getName(), pocUser.getEmailId(), pocUser.getPhoneNo());
+//                    }
+//                }
                 ProjectTO projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj
-                        .getEndDate(), prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocs, prj.getStatus());
+                        .getEndDate(), prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocTo, prj.getStatus());
                 projectTOs.add(projectTO);
             }
 //            }).collect(Collectors.toList());
@@ -121,18 +121,25 @@ public class ProjectService {
         //return 2; failed- Project can not be deleted. It is in <state> state.
     }
 
-    public int saveOrUpdate(Project project) {
+    public int saveOrUpdate(ProjectTO prjTO) {
         int returnVal = 1;
-        logger.info("Following project details have been received from User: "+project);
+        logger.info("Following project details have been received from User: "+prjTO);
         // Todo : To remove checkProjectById(project.getProjectId() from below
         // Todo: Logic for which fields to allow to be updated
-        if (project.getProjectId() != null && checkProjectById(project.getProjectId()))
+        // Todo: Need to provide transactional support.
+        Project prj = null;
+        Optional<Project> prjOpnl = projectRepository.findById(prjTO.getProjectId());
+        if (prjTO.getProjectId() != null && prjOpnl.isPresent()) {
             logger.info("Updating existing project.");
-        else {
-            project.setProjectId(ObjectId.get());
+            prj = new Project(new ObjectId(prjTO.getProjectId()), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
+                    prjTO.getLocation(), prjTO.getStakeholder().getUserId(), prjTO.getPointOfContact().getUserId(), prjTO.getStatus());
+        } else {
+            prj = new Project(new ObjectId(prjTO.getProjectId()), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
+                    prjTO.getLocation(), prjTO.getStakeholder().getUserId(), prjTO.getPointOfContact().getUserId(), "Created");
+            prj.setProjectId(ObjectId.get());
             logger.info("New Project will be created.");
         }
-        Project savedProj = projectRepository.save(project);
+        Project savedProj = projectRepository.save(prj);
         logger.info("Following project has been saved successfully: \n"+savedProj);
         //return project;
         if (savedProj != null)
