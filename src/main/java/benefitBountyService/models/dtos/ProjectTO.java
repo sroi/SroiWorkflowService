@@ -13,12 +13,16 @@ public class ProjectTO {
     private Double budget;
     private String corporate;
     private String location;
-    private UserTO stakeholder;
-    private UserTO pointOfContact;
+    private PTUserTO stakeholder;
+    private PTUserTO pointOfContact;
     private String status;
 
+    public ProjectTO() {
+        super();
+    }
+
     public ProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location,
-                     UserTO stakeholder, UserTO pointOfContact, String status) {
+                     PTUserTO stakeholder, PTUserTO pointOfContact, String status) {
         this.projectId = projectId;
         this.name = name;
         this.areaOfEngagement = areaOfEngagement;
@@ -105,19 +109,19 @@ public class ProjectTO {
         this.location = location;
     }
 
-    public UserTO getStakeholder() {
+    public PTUserTO getStakeholder() {
         return stakeholder;
     }
 
-    public void setStakeholder(UserTO stakeholder) {
+    public void setStakeholder(PTUserTO stakeholder) {
         this.stakeholder = stakeholder;
     }
 
-    public UserTO getPointOfContact() {
+    public PTUserTO getPointOfContact() {
         return pointOfContact;
     }
 
-    public void setPointOfContact(UserTO pointOfContact) {
+    public void setPointOfContact(PTUserTO pointOfContact) {
         this.pointOfContact = pointOfContact;
     }
 

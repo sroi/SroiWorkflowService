@@ -2,7 +2,6 @@ package benefitBountyService.controllers;
 
 import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
-import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.services.ProjectService;
@@ -55,8 +54,8 @@ public class ProjectController {
      * Return Value -  Return task details
      */
     @RequestMapping(value = "/get" , method=RequestMethod.GET)
-    public Project getProjectDetailsByProjectId(@RequestParam("pid") String projectId) {
-        Project project = null;
+    public ProjectTO getProjectDetailsByProjectId(@RequestParam("pid") String projectId) {
+        ProjectTO project = null;
         try {
             project = projectService.getProjectDetailsById(projectId);
             return project;

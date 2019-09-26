@@ -1,21 +1,29 @@
 package benefitBountyService.models.dtos;
 
-public class UserTO {
+public class PTUserTO {
 
     private String id;
     private String name;
     private String email;
     private String phoneNo;
 
-    public UserTO(String id, String name, String email, String phoneNo) {
+    public PTUserTO() {
+        super();
+    }
+
+    public PTUserTO(String id, String name, String email, String phoneNo) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNo = phoneNo;
     }
 
-    public String getUserId() {
+    public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -32,7 +40,7 @@ public class UserTO {
 
     @Override
     public String toString() {
-        return "UserTO{" +
+        return "PTUserTO{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNo='" + phoneNo + '\'' +

@@ -34,6 +34,10 @@ public class User {
         return _id.toString();
     }
 
+    public void set_id(Object _id) {
+        this._id = _id;
+    }
+
     public String getUserId() {
         return userId;
     }
