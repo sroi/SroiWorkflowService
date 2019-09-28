@@ -1,12 +1,9 @@
 package benefitBountyService.controllers;
 
-import benefitBountyService.models.User;
+import benefitBountyService.models.dtos.UserTO;
 import benefitBountyService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,7 +17,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/all")
-    public List<User> getUsers(){
-        return userService.getUsers();
+    public List<UserTO> getUsers(){
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/get")
+    public UserTO getUserById(@RequestParam("uid") String id){
+        return userService.getUserDetailsById(id);
     }
 }

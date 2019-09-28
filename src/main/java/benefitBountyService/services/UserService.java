@@ -3,6 +3,7 @@ package benefitBountyService.services;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
+import benefitBountyService.models.dtos.UserTO;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -22,13 +24,26 @@ public class UserService {
 
     public List<User> getUsers() {
         List<User> users = userRepository.findAll();
-        if (users.isEmpty()){
+//        List<UserTO> usersTo =  null;
+        if (users.isEmpty()) {
             logger.info("Users not found.");
         }
         return users;
     }
 
-    public User getUserById(String _id) {
+    public List<UserTO> getAllUsers() {
+        List<User> users = getUsers();
+        List<UserTO> usersTo =  null;
+        if (users.isEmpty()){
+            logger.info("Users not found.");
+        } else {
+            usersTo = users.parallelStream().map(user -> new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(), user.getPhoneNo(),
+                    user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer())).collect(Collectors.toList());
+        }
+        return usersTo;
+    }
+
+    private User getUserById(String _id) {
         User usr = null;
         Optional<User> optUser = userRepository.findById(_id);
         if (optUser.isPresent()){
@@ -36,6 +51,19 @@ public class UserService {
             logger.info("Users found for id '"+ _id +"'.");
         }
         return usr;
+    }
+
+    public UserTO getUserDetailsById(String _id) {
+        UserTO userTo = null;
+        User user = null;
+        Optional<User> optUser = userRepository.findById(_id);
+        if (optUser.isPresent()){
+            user = optUser.get();
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
+                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
+            logger.info("Users found: "+ userTo);
+        }
+        return userTo;
     }
 
     private User saveUser(PTUserTO userTo, User user) {
@@ -59,8 +87,9 @@ public class UserService {
         return saveUser(userTo, sh);
     }
 
-    private User saveOrUpdateUser(User user){
-        user.set_id(ObjectId.get());
+    public User saveOrUpdateUser(User user){
+        if (user.getObjectId() == null)
+            user.set_id(ObjectId.get());
         logger.info("Saving User: " + user);
         return userRepository.save(user);
     }

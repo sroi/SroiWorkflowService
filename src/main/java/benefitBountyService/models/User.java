@@ -1,5 +1,7 @@
 package benefitBountyService.models;
 
+import benefitBountyService.utils.Constants;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class User {
 
     @Id
-    private Object _id;
+    private ObjectId _id;
     @Indexed(unique = true)
     @Field("user_id")
     private String userId;
@@ -20,21 +22,24 @@ public class User {
     @Field("phone_no")
     private String phoneNo;
     @Field("is_admin")
-    private String admin;
+    private String admin = Constants.NO;
     @Field("is_stakeholder")
-    private String stakeholder;
+    private String stakeholder = Constants.NO;
     @Field("is_approver")
-    private String approver;
+    private String approver = Constants.NO;
     @Field("is_volunteer")
-    private String volunteer;
-
-    private static String YES = "Y";
+    private String volunteer = Constants.NO;
+//    private String status;
 
     public String get_id() {
         return _id.toString();
     }
 
-    public void set_id(Object _id) {
+    public ObjectId getObjectId() {
+        return _id;
+    }
+
+    public void set_id(ObjectId _id) {
         this._id = _id;
     }
 
@@ -46,11 +51,11 @@ public class User {
         this.userId = userId;
     }
 
-    public String getPwd() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPwd(String pwd) {
+    public void setPassword(String pwd) {
         this.password = pwd;
     }
 
@@ -131,6 +136,7 @@ public class User {
                 ", stakeholder=" + stakeholder +
                 ", approver=" + approver +
                 ", volunteer=" + volunteer +
+//                ", status=" + status +
                 '}';
     }
 
@@ -146,13 +152,13 @@ public class User {
         boolean isValid = false;
         switch(Roles.valueOf(role)){
             case Admin:
-                isValid = getAdmin().equals(YES); break;
+                isValid = getAdmin().equals(Constants.YES); break;
             case Approver:
-                isValid = getApprover().equals(YES); break;
+                isValid = getApprover().equals(Constants.YES); break;
             case Stakeholder:
-                isValid = getStakeholder().equals(YES); break;
+                isValid = getStakeholder().equals(Constants.YES); break;
             case Volunteer:
-                isValid = getVolunteer().equals(YES); break;
+                isValid = getVolunteer().equals(Constants.YES); break;
             default:
                 isValid = false;
         }

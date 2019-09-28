@@ -36,7 +36,7 @@ public class LoginService {
         try {
             Optional<User> optUser = userRepository.findByUserId(login.getUsername());
             User user = optUser.get();
-            if (!(user.getUserId().equals(login.getUsername()) && user.getPwd().equals(login.getPassword()))){
+            if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");
             } else if (!user.isValidRole(login.getRole())) {

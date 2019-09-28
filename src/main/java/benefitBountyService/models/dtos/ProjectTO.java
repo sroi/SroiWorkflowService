@@ -16,13 +16,18 @@ public class ProjectTO {
     private PTUserTO stakeholder;
     private PTUserTO pointOfContact;
     private String status;
+    private Double rating;
+    private String updatedBy;
+    private Date updatedOn;
+    private String createdBy;
+    private Date createdOn;
 
     public ProjectTO() {
         super();
     }
 
     public ProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location,
-                     PTUserTO stakeholder, PTUserTO pointOfContact, String status) {
+                     PTUserTO stakeholder, PTUserTO pointOfContact, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
         this.projectId = projectId;
         this.name = name;
         this.areaOfEngagement = areaOfEngagement;
@@ -35,6 +40,11 @@ public class ProjectTO {
         this.stakeholder = stakeholder;
         this.pointOfContact = pointOfContact;
         this.status = status;
+        this.rating = rating;
+        this.updatedBy = updatedBy;
+        this.updatedOn = updatedOn;
+        this.createdBy = createdBy;
+        this.createdOn = createdOn;
     }
 
     public String getProjectId() {
@@ -133,6 +143,46 @@ public class ProjectTO {
         this.status = status;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(Date updatedOn) {
+        this.updatedOn = updatedOn;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
     @Override
     public String toString() {
         return "ProjectTO{" +
@@ -148,6 +198,7 @@ public class ProjectTO {
                 ", stakeholder=" + stakeholder +
                 ", pointOfContacts=" + pointOfContact +
                 ", status='" + status + '\'' +
+                ", rating='" + rating + '\'' +
                 '}';
     }
 }

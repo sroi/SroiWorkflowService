@@ -27,11 +27,20 @@ public class Project {
 	private String stakeholder;
 	private String pointOfContacts;
 	private String status;
+	private Double rating;
+	@Field("created_on")
+	private Date createdOn;
+	@Field("created_by")
+	private String createdBy;
+	@Field("updated_on")
+	private Date updatedOn;
+	@Field("updated_by")
+	private String updatedBy;
 	//private IAdmin admin;
 
 
 	public Project(ObjectId projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String associatedCorporateEntity,
-				   String location, String stakeholder, String pointOfContacts, String status) {
+				   String location, String stakeholder, String pointOfContacts, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
 		this.projectId = projectId;
 		this.name = name;
 		this.areaOfEngagement = areaOfEngagement;
@@ -44,6 +53,11 @@ public class Project {
 		this.stakeholder = stakeholder;
 		this.pointOfContacts = pointOfContacts;
 		this.status = status;
+		this.rating = rating;
+		this.updatedBy = updatedBy;
+		this.updatedOn = updatedOn;
+		this.createdBy = createdBy;
+		this.createdOn = createdOn;
 	}
 
 	public String getProjectId() {
@@ -142,6 +156,46 @@ public class Project {
 		this.status = status;
 	}
 
+	public Double getRating() {
+		return rating;
+	}
+
+	public void setRating(Double rating) {
+		this.rating = rating;
+	}
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Date getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
 	@Override
 	public String toString() {
 		return "Project{" +
@@ -157,6 +211,9 @@ public class Project {
 				", stakeholders=" + stakeholder +
 				", pointOfContacts=" + pointOfContacts +
 				", status='" + status + '\'' +
+				", rating='" + rating + '\'' +
+				", createdBy='" + createdBy + '\'' +
+				", createdOn='" + createdOn + '\'' +
 				'}';
 	}
 }

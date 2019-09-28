@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,8 +55,8 @@ public class ProjectService {
                     logger.info("Retrieving data for POC of project");
                     PTUserTO pocTo = getPTUserTOFromMap(prj.getPointOfContacts(),userMap);
 
-                    ProjectTO projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj
-                            .getEndDate(), prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocTo, prj.getStatus());
+                    ProjectTO projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj.getEndDate(),
+                            prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocTo, prj.getStatus(), prj.getRating(), prj.getUpdatedBy(), prj.getUpdatedOn(), prj.getCreatedBy(), prj.getCreatedOn());
                     projectTOs.add(projectTO);
                 }
             } else {
@@ -117,8 +114,8 @@ public class ProjectService {
             poc = getPTUserTOFromMap(prj.getPointOfContacts(),userMap);
 
         }
-        projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj
-                .getEndDate(), prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, poc, prj.getStatus());
+        projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj.getEndDate(), prj.getBudget(),
+                prj.getCorporate(), prj.getLocation(), stHolder, poc, prj.getStatus(), prj.getRating(), prj.getUpdatedBy(), prj.getUpdatedOn(), prj.getCreatedBy(), prj.getCreatedOn());
 
         return projectTO;
     }
@@ -160,12 +157,12 @@ public class ProjectService {
         // Todo: Need to provide transactional support.
         // Todo: Activity_capture need to be updated.
 
-        boolean isProjectPresent = false;
+        Project project = null;
         if (prjTO.getProjectId() != null) {
             Optional<Project> prjOpnl = projectRepository.findById(prjTO.getProjectId());
-            isProjectPresent = prjOpnl.isPresent();
+            project = prjOpnl.isPresent() ? prjOpnl.get() : null;
         }
-        Project savedProj = saveOrUpdateProject(prjTO, isProjectPresent);
+        Project savedProj = saveOrUpdateProject(prjTO, project);
         logger.info("Following project has been saved successfully: \n"+savedProj);
         //return project;
         if (savedProj != null)
@@ -174,19 +171,26 @@ public class ProjectService {
     }
 
     @Transactional
-    private Project saveOrUpdateProject(ProjectTO prjTO, boolean isProjPresent) {
+    private Project saveOrUpdateProject(ProjectTO prjTO, Project project) {
+        //ToDo: To support server locale for storing Date for created_on and updated_on
+        String loggedInUser = "admin";
         Project prj = null;
-        if (prjTO.getProjectId() != null && isProjPresent) {
+        if (prjTO.getProjectId() != null && project != null) {
             prjTO = saveOrUpdateProjectUsers(prjTO);
+            String stHldId = (prjTO.getStakeholder() != null) ? prjTO.getStakeholder().getId() : Constants.EMPTY;
+            String pocId = prjTO.getPointOfContact() != null ? prjTO.getPointOfContact().getId() : Constants.EMPTY;
             logger.info("Updating existing project...");
             prj = new Project(new ObjectId(prjTO.getProjectId()), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
-                    prjTO.getLocation(), prjTO.getStakeholder().getId(), prjTO.getPointOfContact().getId(), prjTO.getStatus());
+                    prjTO.getLocation(), stHldId, pocId, prjTO.getStatus(), prjTO.getRating(), loggedInUser, new Date(), project.getCreatedBy(), project.getCreatedOn());
 
         } else {
             prjTO = saveOrUpdateProjectUsers(prjTO);
+            Double rating = 0.0d;//Double.MIN_VALUE;
             logger.info("Creating new Project..." + prjTO);
-            prj = new Project(ObjectId.get(), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(),
-                    prjTO.getBudget(), prjTO.getCorporate(), prjTO.getLocation(), prjTO.getStakeholder().getId(), prjTO.getPointOfContact().getId(), Constants.CR_STATUS);
+            String stHldId = (prjTO.getStakeholder() != null) ? prjTO.getStakeholder().getId() : Constants.EMPTY;
+            String pocId = prjTO.getPointOfContact() != null ? prjTO.getPointOfContact().getId() : Constants.EMPTY;
+            prj = new Project(ObjectId.get(), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
+                    prjTO.getLocation(), stHldId, pocId, Constants.CR_STATUS, rating, loggedInUser, new Date(), loggedInUser, new Date());
             //prj.setProjectId(ObjectId.get());
         }
         Project savedProj = projectRepository.save(prj);
@@ -199,18 +203,32 @@ public class ProjectService {
         User poc = null;
         PTUserTO toStakeholder = prjTO.getStakeholder();
         PTUserTO toPOC = prjTO.getPointOfContact();
+        List<User> users = userService.getUsers();
+        Map<String, User> userMap = null;
+        if (!users.isEmpty()) {
+            userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
+        }
         if (toStakeholder != null && toStakeholder.getEmail() != null) {//&& !toStakeholder.getUserId().equals(prj.getStakeholder())){
             if (toStakeholder.getId() != null) {
-                stkHldId = toStakeholder.getId();
+                //stkHldId = toStakeholder.getId();
+                User sHolder = userMap.get(toStakeholder.getId());
+                if (sHolder != null) {
+                    if (!sHolder.getStakeholder().equals(Constants.YES))
+                        userService.saveOrUpdateUser(sHolder);
+                    stkHldId = sHolder.get_id();
+                } else {
+                    logger.info("Todo : Run away from this flow and tell user to provide details. The combination of name and id for below user doesn't exist=> " + toStakeholder.getId() + " and " + toStakeholder.getName());
+                    // Todo : Run away from this flow and tell user to provide details
+                }
             } else {
                 logger.info("Saving stakeholder details for Project: "+prjTO.getName()+" <-> " + prjTO.getLocation());
                 stakeHolder = userService.saveStakeHolder(toStakeholder);
                 stkHldId = stakeHolder.get_id();
             }
+            toStakeholder.setId(stkHldId);
         } else {
-            logger.info("No stakeholder details are provided in Project.");
+            logger.info("No stakeholder details are provided in Project. At least emailId should be provided.");
         }
-        toStakeholder.setId(stkHldId);
 
         if (toPOC != null && toPOC.getEmail() != null) {//&& !toStakeholder.getUserId().equals(prj.getStakeholder())){
             if (toPOC.getId() != null) {
@@ -220,10 +238,10 @@ public class ProjectService {
                 poc = userService.savePOC(toPOC);
                 pocId = poc.get_id();
             }
+            toPOC.setId(pocId);
         } else {
-            logger.info("No POC details are provided in Project.");
+            logger.info("No POC details are provided in Project. At least emailId should be provided.");
         }
-        toPOC.setId(pocId);
         return prjTO;
     }
 
