@@ -1,13 +1,12 @@
 package benefitBountyService.models.dtos;
 
-import org.bson.types.ObjectId;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class TaskTO {
 
-    private ObjectId taskId;
+    private String taskId;
     private String name;
     private String description;
     private String projectId;
@@ -16,13 +15,17 @@ public class TaskTO {
     private Date endDate;
     private String location;
     private PTUserTO approver;
-    private List<PTUserTO> volunteers;
+    private List<PTUserTO> volunteers = new ArrayList<>();
     private String created_by;
     private Date created_on;
     private String updated_by;
     private Date updated_on;
 
-    public TaskTO(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, PTUserTO approver,
+    public TaskTO() {
+        super();
+    }
+
+    public TaskTO(String taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, PTUserTO approver,
                   List<PTUserTO> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
@@ -41,10 +44,10 @@ public class TaskTO {
     }
 
     public String getTaskId() {
-        return taskId.toString();
+        return taskId;
     }
 
-    public void setTaskId(ObjectId taskId) {
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 

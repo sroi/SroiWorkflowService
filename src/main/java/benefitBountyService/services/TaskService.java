@@ -11,10 +11,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +84,7 @@ public class TaskService {
         PTUserTO aprTO = getApproverTOForTask(task);
         List<PTUserTO> vols = getVolunteersTOForTask(task);
 
-        TaskTO taskTO = new TaskTO(new ObjectId(task.getTaskId()),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
+        TaskTO taskTO = new TaskTO(task.getTaskId(),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
                 aprTO, vols, task.getCreated_by(), task.getCreated_on(), task.getUpdated_by(), task.getUpdated_on());
         return taskTO;
     }
@@ -150,15 +153,20 @@ public class TaskService {
         logger.info("Following task details have been received from User: "+taskTO);
         // Todo : To remove checkTaskById(project.getProjectId() from below
         // Todo: Logic for which fields to allow to be updated
+        // Todo : No check for ProjectId.
 //        TaskTO taskTO = null;
         Task task = null;
-        if (task.getTaskId() != null && checkTaskById(task.getTaskId())) {
-            task = createTaskFromTaskTO(taskTO);
+        List<User> users = userService.getUsers();
+        Map<String, User> userMap = null;
+        if (!users.isEmpty()) {
+            userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
+        }
+        if (!StringUtils.isEmpty(taskTO.getTaskId())) {
+            task = updateTaskFromTaskTO(taskTO, userMap);
             logger.info("Updating existing task.");
         } else {
-            task = createTaskFromTaskTO(taskTO);
+            task = saveTaskFromTaskTO(taskTO, userMap);
             logger.info("New Task will be created.");
-            task.setTaskId(ObjectId.get());
         }
         Task savedTask = taskRepository.save(task);
         logger.info("Following task has been saved successfully: \n"+savedTask);
@@ -168,11 +176,98 @@ public class TaskService {
         return returnVal;
     }
 
-    private Task createTaskFromTaskTO(TaskTO taskTO) {
-        List<String> volunteers = taskTO.getVolunteers().stream().map(vol -> vol.getId()).collect(Collectors.toList());
-        Task task = new Task(new ObjectId(taskTO.getTaskId()),taskTO.getName(), taskTO.getDescription(), taskTO.getProjectId(), taskTO.getActivityLabel(), taskTO.getStartDate(), taskTO.getEndDate(), taskTO.getLocation(),
-                taskTO.getApprover().getId(), volunteers, taskTO.getCreated_by(), taskTO.getCreated_on(), taskTO.getUpdated_by(), taskTO.getCreated_on());
+    @Transactional
+    private Task saveTaskFromTaskTO(TaskTO taskTO, Map<String, User> userMap) {
+        String loggedInUser = "admin";
+
+        String apprId = checkAndSaveApprover(taskTO, userMap);
+
+        List<String> volunteers = checkAndSaveVolunteers(taskTO, userMap);
+
+        Task task = new Task(ObjectId.get(),taskTO.getName(), taskTO.getDescription(), taskTO.getProjectId(), taskTO.getActivityLabel(), taskTO.getStartDate(), taskTO.getEndDate(), taskTO.getLocation(),
+                apprId, volunteers, loggedInUser, new Date(), loggedInUser, new Date());
 
         return task;
+    }
+
+    @Transactional
+    private Task updateTaskFromTaskTO(TaskTO taskTO, Map<String, User> userMap) {
+        String loggedInUser = "admin";
+        Task task = null;
+        Task existingTask = taskRepository.findById(taskTO.getTaskId()).get();
+        if (existingTask != null) {
+            String apprId = checkAndSaveApprover(taskTO, userMap);
+
+            List<String> volunteers = checkAndSaveVolunteers(taskTO, userMap);
+
+            task = new Task(new ObjectId(taskTO.getTaskId()),taskTO.getName(), taskTO.getDescription(), taskTO.getProjectId(), taskTO.getActivityLabel(), taskTO.getStartDate(), taskTO.getEndDate(), taskTO.getLocation(),
+                    apprId, volunteers, loggedInUser, new Date(), existingTask.getCreated_by(), existingTask.getCreated_on());
+        } else {
+            String errMsg = "This task is not present in Database for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+        }
+        return task;
+    }
+
+    private String checkAndSaveApprover(TaskTO taskTO, Map<String, User> userMap) {
+        String apprId = null;
+        User appr = null;
+        if (taskTO.getApprover() != null) {
+            if (!StringUtils.isEmpty(taskTO.getApprover().getId())) {
+                appr = userMap.get(taskTO.getApprover().getId());
+                apprId = appr.get_id();//Assuming approver is always present in UserMap
+            } else {
+                // This is new approver
+                if (!StringUtils.isEmpty(taskTO.getApprover().getEmail())) {
+                    User user = userService.getUserByEmail(taskTO.getApprover().getEmail());
+                    if(user != null) {
+                        String errMsg = "User already exist with email Id: " + taskTO.getApprover().getEmail() + " for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
+                        logger.info(errMsg);
+                        throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+                    }
+                    appr = userService.saveApprover(taskTO.getApprover());
+                    apprId = appr.get_id();
+                } else {
+                    logger.info("Email Id must be provided for Approver for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
+                }
+            }
+        } else {
+            logger.info("Approver details are not provided while creating Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
+        }
+        return apprId;
+    }
+
+    private List<String> checkAndSaveVolunteers(TaskTO taskTO, Map<String, User> userMap) {
+        List<PTUserTO> volunteersWithId = null, volunteersWOId = null;
+        List<PTUserTO> validNewVols = null;
+        List<String> existingVols = null, newVolsId = null;
+        List<String> volunteers = new ArrayList<>();
+        if(!taskTO.getVolunteers().isEmpty()) {
+            volunteersWithId = taskTO.getVolunteers().parallelStream().filter(vol -> !StringUtils.isEmpty(vol.getId())).collect(Collectors.toList());
+            existingVols = volunteersWithId.stream().filter(vol -> userMap.get(vol.getId()) != null).map(vol -> vol.getId()).collect(Collectors.toList());
+            volunteers.addAll(existingVols);
+
+            volunteersWOId = taskTO.getVolunteers().parallelStream().filter(vol -> StringUtils.isEmpty(vol.getId())).collect(Collectors.toList());
+            validNewVols = volunteersWOId.stream().filter(vol -> !StringUtils.isEmpty(vol.getEmail())).collect(Collectors.toList());
+            if (validNewVols.size() == volunteersWOId.size()) {
+                newVolsId =  saveVolunteers(validNewVols);
+                volunteers.addAll(newVolsId);
+            } else {
+                String errMsg = "Email IDs of some/all volunteers are not provided. Please provide for all.";
+                logger.info(errMsg);
+                throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+            }
+
+        } else {
+            volunteers = null;
+            logger.info("Approver details are not provided while creating Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
+        }
+        return volunteers;
+    }
+
+    private List<String> saveVolunteers(List<PTUserTO> vols) {
+        List<User> newVols = userService.saveVolunteers(vols);
+        return newVols.parallelStream().map(User::get_id).collect(Collectors.toList());
     }
 }

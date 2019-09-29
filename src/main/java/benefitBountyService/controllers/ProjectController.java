@@ -1,11 +1,8 @@
 package benefitBountyService.controllers;
 
-import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.dtos.ProjectTO;
-import benefitBountyService.models.dtos.TaskTO;
 import benefitBountyService.services.ProjectService;
-import benefitBountyService.services.TaskService;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
@@ -24,9 +21,6 @@ public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private TaskService taskService;
 
     @RequestMapping("/ping")
     public String getProjectControllerStatus(){
@@ -66,59 +60,6 @@ public class ProjectController {
     }
 
     /**
-     * Description - To find list of tasks satisfying given projectId condition.
-     * Param - Project_id (in String format)
-     * Return Value -  Return list of tasks
-     */
-    @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
-    public List<TaskTO> getTasksDetailsByProject(@RequestParam("pid") String projectId) throws BadInputException{
-//        if (projectId == null)
-//            throw new BadInputException("Project Id");
-        List<TaskTO> tasks = null;
-        try {
-            tasks = taskService.getTasksDetailsByProject(projectId);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This project Id doesn't have tasks.",e);
-        }
-        return tasks;
-    }
-
-    /**
-     * Description - To find task details for given taskId.
-     * Param - tid (in String format)
-     * Return Value -  Return task details
-     */
-    @RequestMapping(value = "/task" , method=RequestMethod.GET)
-    public TaskTO getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
-        /*if (taskId == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task Id can not be empty");*/
-        TaskTO task = null;
-        try {
-            task = taskService.getTaskDetailsById(taskId);
-            return task;
-        } catch (ResourceNotFoundException e) {
-//            System.out.println("catch (TaskNotFoundException e)");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This task Id doesn't exist.", e);
-        }
-    }
-
-    /**
-     * Description - To find list of tasks satisfying given task name.
-     * Param - task_name (in String format)
-     * Return Value -  Return list of tasks
-     */
-    @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
-    public List<TaskTO> getTasksDetailsByName(@RequestParam("tname") String taskName){
-        List<TaskTO> tasks = null;
-        try{
-            tasks = taskService.getTasksDetailsByName(taskName);
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide proper task name.", e);
-        }
-        return tasks;
-    }
-
-    /**
      * Description - To create new projects.
      * Param - project object
      * Return Value -  int -> 0 - success
@@ -127,17 +68,6 @@ public class ProjectController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public int addProject(@RequestBody ProjectTO project){
         return projectService.saveOrUpdate(project);
-    }
-
-    /**
-     * Description - To create new task.
-     * Param - task object
-     * Return Value -  int -> 0 - success
-     *                     -> 1 - failed
-     */
-    @RequestMapping(value = "/createTask", method = RequestMethod.POST)
-    public int addTask(@RequestBody TaskTO task){
-        return taskService.saveOrUpdate(task);
     }
 
     /**
@@ -150,18 +80,6 @@ public class ProjectController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public int deleteProject(@RequestParam("pid") String projectId){
         return projectService.deleteProject(projectId);
-    }
-
-    /**
-     * Description - To delete existing task.
-     * Param - Task (in String format)
-     * Return Value -  int -> 0 - success
-     *                     -> 1 - failed- Task not found. Please refresh Task table.
-     *                     -> 2 - failed- Task can not be deleted. It is in <state> state.
-     */
-    @RequestMapping(value = "/deleteTask", method = RequestMethod.DELETE)
-    public int deleteTask(@RequestParam("tid") String taskId){
-        return taskService.deleteTask(taskId);
     }
 
     /**

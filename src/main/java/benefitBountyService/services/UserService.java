@@ -66,6 +66,16 @@ public class UserService {
         return userTo;
     }
 
+    public User getUserByEmail(String emailId) {
+        User usr = null;
+        Optional<User> optUser = userRepository.findByEmail(emailId);
+        if (optUser.isPresent()){
+            usr = optUser.get();
+            logger.info("Users found for Email Id '"+ emailId +"'.");
+        }
+        return usr;
+    }
+
     private User saveUser(PTUserTO userTo, User user) {
 //        User user = new User();
         user.setEmailId(userTo.getEmail());
@@ -92,5 +102,28 @@ public class UserService {
             user.set_id(ObjectId.get());
         logger.info("Saving User: " + user);
         return userRepository.save(user);
+    }
+
+    public User saveApprover(PTUserTO appr) {
+        User apvr = new User();
+        apvr.setApprover("Y");
+        return saveUser(appr, apvr);
+    }
+
+    public User setVolunteer(PTUserTO volunteer) {
+        User vol = new User();
+        vol.set_id(ObjectId.get());
+        vol.setEmailId(volunteer.getEmail());
+        vol.setName(volunteer.getName());
+        vol.setPhoneNo(volunteer.getPhoneNo());
+        vol.setUserId(volunteer.getEmail());
+        vol.setVolunteer("Y");
+        return vol;
+    }
+
+    public List<User> saveVolunteers(List<PTUserTO> vols) {
+        List<User> newVols = vols.stream().map(vol -> setVolunteer(vol)).collect(Collectors.toList());
+        logger.info("Saving Volunteers: " + newVols);
+        return userRepository.saveAll(newVols);
     }
 }
