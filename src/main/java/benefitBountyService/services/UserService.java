@@ -43,7 +43,7 @@ public class UserService {
         return usersTo;
     }
 
-    private User getUserById(String _id) {
+    public User getUserById(String _id) {
         User usr = null;
         Optional<User> optUser = userRepository.findById(_id);
         if (optUser.isPresent()){

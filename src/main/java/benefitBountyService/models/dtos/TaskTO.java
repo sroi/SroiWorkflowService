@@ -1,39 +1,29 @@
-package benefitBountyService.models;
+package benefitBountyService.models.dtos;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 import java.util.List;
 
-@Document(collection = "tasks")
-public class Task {
+public class TaskTO {
 
-    @Id
-    @Field("_id")
     private ObjectId taskId;
     private String name;
     private String description;
     private String projectId;
-    @Field("label")
-    @JsonSetter("label")
     private String activityLabel;
     private Date startDate;
     private Date endDate;
     private String location;
-    private String approver;
-    private List<String> volunteers;
+    private PTUserTO approver;
+    private List<PTUserTO> volunteers;
     private String created_by;
     private Date created_on;
     private String updated_by;
     private Date updated_on;
 
-
-    public Task(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location,
-                String approver, List<String> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
+    public TaskTO(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, PTUserTO approver,
+                  List<PTUserTO> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -86,7 +76,7 @@ public class Task {
         return activityLabel;
     }
 
-    public void setLabel(String activityLabel) {
+    public void setActivityLabel(String activityLabel) {
         this.activityLabel = activityLabel;
     }
 
@@ -114,19 +104,19 @@ public class Task {
         this.location = location;
     }
 
-    public String getApprover() {
+    public PTUserTO getApprover() {
         return approver;
     }
 
-    public void setApprover(String approver) {
+    public void setApprover(PTUserTO approver) {
         this.approver = approver;
     }
 
-    public List<String> getVolunteers() {
+    public List<PTUserTO> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(List<String> volunteers) {
+    public void setVolunteers(List<PTUserTO> volunteers) {
         this.volunteers = volunteers;
     }
 
@@ -164,7 +154,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "TaskTO{" +
                 "taskId=" + taskId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

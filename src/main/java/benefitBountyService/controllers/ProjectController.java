@@ -2,8 +2,8 @@ package benefitBountyService.controllers;
 
 import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
-import benefitBountyService.models.Task;
 import benefitBountyService.models.dtos.ProjectTO;
+import benefitBountyService.models.dtos.TaskTO;
 import benefitBountyService.services.ProjectService;
 import benefitBountyService.services.TaskService;
 import com.mongodb.MongoClient;
@@ -49,7 +49,7 @@ public class ProjectController {
     }
 
     /**
-     * Description - To find task details for given taskId.
+     * Description - To find Project details for given taskId.
      * Param - tid (in String format)
      * Return Value -  Return task details
      */
@@ -71,14 +71,14 @@ public class ProjectController {
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks" , method=RequestMethod.GET)
-    public List<Task> getTasksDetailsByProject(@RequestParam("pid") String projectId) throws BadInputException{
+    public List<TaskTO> getTasksDetailsByProject(@RequestParam("pid") String projectId) throws BadInputException{
 //        if (projectId == null)
 //            throw new BadInputException("Project Id");
-        List<Task> tasks = null;
+        List<TaskTO> tasks = null;
         try {
             tasks = taskService.getTasksDetailsByProject(projectId);
         } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct project Id.",e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This project Id doesn't have tasks.",e);
         }
         return tasks;
     }
@@ -89,16 +89,16 @@ public class ProjectController {
      * Return Value -  Return task details
      */
     @RequestMapping(value = "/task" , method=RequestMethod.GET)
-    public Task getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
+    public TaskTO getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
         /*if (taskId == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task Id can not be empty");*/
-        Task task = null;
+        TaskTO task = null;
         try {
             task = taskService.getTaskDetailsById(taskId);
             return task;
         } catch (ResourceNotFoundException e) {
 //            System.out.println("catch (TaskNotFoundException e)");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct task Id.", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This task Id doesn't exist.", e);
         }
     }
 
@@ -108,8 +108,8 @@ public class ProjectController {
      * Return Value -  Return list of tasks
      */
     @RequestMapping(value = "/tasks/name" , method=RequestMethod.GET)
-    public List<Task> getTasksDetailsByName(@RequestParam("tname") String taskName){
-        List<Task> tasks = null;
+    public List<TaskTO> getTasksDetailsByName(@RequestParam("tname") String taskName){
+        List<TaskTO> tasks = null;
         try{
             tasks = taskService.getTasksDetailsByName(taskName);
         } catch (ResourceNotFoundException e) {
@@ -136,8 +136,8 @@ public class ProjectController {
      *                     -> 1 - failed
      */
     @RequestMapping(value = "/createTask", method = RequestMethod.POST)
-    public int addTask(@RequestBody Task task){
-        return taskService.createTask(task);
+    public int addTask(@RequestBody TaskTO task){
+        return taskService.saveOrUpdate(task);
     }
 
     /**
