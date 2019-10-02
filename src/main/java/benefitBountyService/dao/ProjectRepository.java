@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ProjectRepository {
 
-    List<Project> findAll();
+    List<Project> findAll(String userId, String role);
 
 }

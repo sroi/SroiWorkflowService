@@ -4,12 +4,12 @@ import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
-import static com.mongodb.client.model.Aggregates.*;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProjectRepositoryImpl implements ProjectRepository {
@@ -19,16 +19,24 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public List<Project> findAll(String userId, String role) {
         MongoCollection<Project> projectCollection = mongoDbClient.getCollection("projects", Project.class);
-        //List<DBObject> unwindItems = new ArrayList<>();
         if(role.equals(User.Roles.Admin.name())) {
-
+            return projectCollection.aggregate(
+                    Arrays.asList(
+                            Aggregates.unwind("$admin"),
+                            Aggregates.match(Filters.eq("admin",userId)),
+                            Aggregates.lookup("users","admin","_id", "admin_details"),
+                            Aggregates.lookup("users","pointsOfContact", "_id", "pointOfContact_details")
+                    )).into(new ArrayList<Project>());
         } else if (role.equals(User.Roles.Stakeholder.name())) {
-            filter.append("stakeholder",userId);
+            return projectCollection.aggregate(
+                    Arrays.asList(
+                            Aggregates.unwind("$stakeholder"),
+                            Aggregates.match(Filters.eq("stakeholder",userId)),
+                            Aggregates.lookup("users","stakeholder","_id", "stakeholder_details"),
+                            Aggregates.lookup("users","pointsOfContact", "_id", "pointOfContact_details")
+                    )).into(new ArrayList<Project>());
+        } else {
+            return new ArrayList<Project>();
         }
-
-        DBObject a = new BasicDBObject()
-
-        //MongoCollection<Project> projectCollection = mongoDbClient.getCollection("projects", Project.class);
-        //return projectCollection.find().into(new ArrayList<Project>());
     }
 }
