@@ -2,7 +2,10 @@ package benefitBountyService.controllers;
 
 import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
+import benefitBountyService.models.Activity;
+import benefitBountyService.models.Task;
 import benefitBountyService.models.dtos.TaskTO;
+import benefitBountyService.services.ActivityService;
 import benefitBountyService.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +21,8 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
-
+    @Autowired
+    private ActivityService activityService;
     /**
      * Description - To find list of tasks satisfying given projectId condition.
      * Param - Project_id (in String format)
@@ -99,4 +103,37 @@ public class TaskController {
     public void getTaskData(@RequestParam("tid") String taskId, @RequestParam("pid") String uid) {
         taskService.getTaskDetailsByTaskAndProject(taskId, uid);
     }
+
+
+    @RequestMapping(value = "/approver" , method=RequestMethod.GET)
+    public List<Task> getTasksDetailsByApprover(@RequestParam("approver") String approver) {
+        /*if (taskId == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Approver can not be empty");*/
+        List<Task> task = null;
+        try {
+            task = taskService.getTaskDetailsByApprover(approver);
+            return task;
+        } catch (ResourceNotFoundException e) {
+//            System.out.println("catch (TaskNotFoundException e)");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct approver Id.", e);
+        }
+    }
+    @RequestMapping(value = "/activity" , method=RequestMethod.GET)
+    public List<Activity> getActivityDetailsBytask(@RequestParam("taskId") String taskId) {
+
+        if (taskId == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "task can not be empty");
+        List<Activity> activityList = null;
+        try {
+            ///  activityList=new ArrayList<>();
+            System.out.println("Below are Task details:getActivityDetailsBytask \n"+ taskId );
+            activityList = activityService.getActivityByTask(taskId);
+
+            return activityList;
+        }  catch (Exception e) {
+//         System.out.println("catch (TaskNotFoundException e)");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct task Id.", e);
+        }
+    }
+
 }
