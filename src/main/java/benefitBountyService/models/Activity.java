@@ -61,13 +61,9 @@ public class Activity {
         this.updatedOn = updatedOn;
     }
 
-<<<<<<< HEAD
+
     public String getActivityId() {
         return activityId.toString();
-=======
-    public ObjectId getActivityId() {
-        return activityId;
->>>>>>> origin/dev
     }
 
     public void setActivityId(ObjectId activityId) {
