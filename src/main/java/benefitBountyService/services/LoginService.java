@@ -37,15 +37,19 @@ public class LoginService {
             Optional<User> optUser = userRepository.findByUserId(login.getUsername());
             User user = optUser.get();
             if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
+                loginStatus = 2;
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");
             } else if (!user.isValidRole(login.getRole())) {
+                loginStatus = 3;
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong role.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"3");
             } else {
+                loginStatus = 0;
                 logger.info("User '"+login.getUsername()+"' is authorized");
             }
         } catch (NoSuchElementException ex) {
+            loginStatus = 1;
             logger.info("User '"+login.getUsername()+"' is not authorized because of wrong Username.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "1", ex);
         }

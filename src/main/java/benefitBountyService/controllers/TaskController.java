@@ -13,7 +13,6 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-//@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/task")
 public class TaskController {
 
@@ -94,5 +93,10 @@ public class TaskController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public int deleteTask(@RequestParam("tid") String taskId){
         return taskService.deleteTask(taskId);
+    }
+
+    @GetMapping("/fetch")
+    public void getTaskData(@RequestParam("tid") String taskId, @RequestParam("pid") String uid) {
+        taskService.getTaskDetailsByTaskAndProject(taskId, uid);
     }
 }

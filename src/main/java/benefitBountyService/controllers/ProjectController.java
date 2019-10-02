@@ -42,6 +42,12 @@ public class ProjectController {
         return projects;
     }
 
+    @RequestMapping(value = "/fetch" , method=RequestMethod.GET)
+    public List<ProjectTO> getProjectsByUser() {
+        List<ProjectTO> projects = projectService.getProjectByUser();
+        return projects;
+    }
+
     /**
      * Description - To find Project details for given taskId.
      * Param - tid (in String format)

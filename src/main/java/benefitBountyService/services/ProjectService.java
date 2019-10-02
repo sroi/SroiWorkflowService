@@ -70,6 +70,13 @@ public class ProjectService {
         return projectTOs;
     }
 
+    public List<ProjectTO> getProjectByUser() {
+        String loggedInUser = null;
+        List<ProjectTO> projectTOList = new ArrayList<>();
+        List<Project> projects = projectRepository.findByCreatedBy(loggedInUser);
+        return projectTOList;
+    }
+
     public boolean checkProjectById(String projectId){
         boolean found = false;
         Optional<Project> prjOpnl = projectRepository.findById(projectId);

@@ -270,4 +270,9 @@ public class TaskService {
         List<User> newVols = userService.saveVolunteers(vols);
         return newVols.parallelStream().map(User::get_id).collect(Collectors.toList());
     }
+
+    public void getTaskDetailsByTaskAndProject(String taskId, String projId){
+        List<Task> tasks = taskRepository.findByTaskIdAndProjectId(taskId, projId);
+        logger.info("Task Details" + tasks);
+    }
 }
