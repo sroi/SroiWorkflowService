@@ -1,12 +1,19 @@
 package benefitBountyService.dao;
 
 import benefitBountyService.models.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface UserRepository extends MongoRepository<User, String> {
-    Optional<User> findByUserId(String id);
+public interface UserRepository {
+    User findByUserId(String id);
 
-    Optional<User> findByEmail(String emailId);
+    User findById(String id);
+
+    User findByEmail(String emailId);
+
+    List<User> findAll();
+
+    void save(User user);
+
+    void saveAll(List<User> usersList);
 }

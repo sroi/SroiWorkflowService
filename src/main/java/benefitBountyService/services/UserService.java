@@ -24,7 +24,6 @@ public class UserService {
 
     public List<User> getUsers() {
         List<User> users = userRepository.findAll();
-//        List<UserTO> usersTo =  null;
         if (users.isEmpty()) {
             logger.info("Users not found.");
         }
@@ -44,40 +43,25 @@ public class UserService {
     }
 
     public User getUserById(String _id) {
-        User usr = null;
-        Optional<User> optUser = userRepository.findById(_id);
-        if (optUser.isPresent()){
-            usr = optUser.get();
-            logger.info("Users found for id '"+ _id +"'.");
-        }
-        return usr;
+        return userRepository.findById(_id);;
     }
 
     public UserTO getUserDetailsById(String _id) {
         UserTO userTo = null;
-        User user = null;
-        Optional<User> optUser = userRepository.findById(_id);
-        if (optUser.isPresent()){
-            user = optUser.get();
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
+        User user = userRepository.findById(_id);
+        userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
-            logger.info("Users found: "+ userTo);
-        }
+        logger.info("Users found: "+ userTo);
         return userTo;
     }
 
     public User getUserByEmail(String emailId) {
-        User usr = null;
-        Optional<User> optUser = userRepository.findByEmail(emailId);
-        if (optUser.isPresent()){
-            usr = optUser.get();
-            logger.info("Users found for Email Id '"+ emailId +"'.");
-        }
+        User usr = userRepository.findByEmail(emailId);
+        logger.info("Users found for Email Id '"+ emailId +"'.");
         return usr;
     }
 
     private User saveUser(PTUserTO userTo, User user) {
-//        User user = new User();
         user.setEmailId(userTo.getEmail());
         user.setName(userTo.getName());
         user.setPhoneNo(userTo.getPhoneNo());
@@ -97,6 +81,12 @@ public class UserService {
         return saveUser(userTo, sh);
     }
 
+    public User saveApprover(PTUserTO appr) {
+        User apvr = new User();
+        apvr.setApprover("Y");
+        return saveUser(appr, apvr);
+    }
+
     public User saveOrUpdateUser(User user){
         if (user.getObjectId() == null)
             user.set_id(ObjectId.get());
@@ -104,11 +94,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User saveApprover(PTUserTO appr) {
-        User apvr = new User();
-        apvr.setApprover("Y");
-        return saveUser(appr, apvr);
-    }
+
 
     public User setVolunteer(PTUserTO volunteer) {
         User vol = new User();

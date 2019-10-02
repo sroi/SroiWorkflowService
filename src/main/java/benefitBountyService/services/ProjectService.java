@@ -32,14 +32,16 @@ public class ProjectService {
     @Autowired
     private UserService userService;
 
-    public List<ProjectTO> getProjects(){
+    public List<ProjectTO> getProjects(String userId, String role){
 //        Todo : get projects depending upon roles
         List<Project> projects = null;
         List<ProjectTO> projectTOs = new ArrayList<>();
         List<User> users = null;
         logger.info("Retrieving projects...");
         try {
-            projects = projectRepository.findAll();
+            projects = projectRepository.findAll(userId, role);
+            // @TODO - Jasraj - please use lookup to get user details as well apart from Project.
+            /*
             Map<String, User> userMap = null;
             if (!projects.isEmpty()){
                 users = userService.getUsers();
@@ -67,6 +69,7 @@ public class ProjectService {
             logger.error("Failure while loading projects in Mongo. {}");
         }
         logger.info("Below are projects details... \n" + projectTOs);
+        */
         return projectTOs;
     }
 

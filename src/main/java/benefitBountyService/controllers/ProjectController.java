@@ -22,6 +22,7 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
+    /*
     @RequestMapping("/ping")
     public String getProjectControllerStatus(){
         try {
@@ -35,10 +36,11 @@ public class ProjectController {
             return "Your application is down";
         }
     }
+     */
 	
 	@RequestMapping(value = "/all" , method=RequestMethod.GET)
-	public List<ProjectTO> getProjects() {
-        List<ProjectTO> projects = projectService.getProjects();
+	public List<ProjectTO> getProjects(@RequestParam("user_id") String userId, @RequestParam("Role") String role) {
+        List<ProjectTO> projects = projectService.getProjects(userId, role);
         return projects;
     }
 
