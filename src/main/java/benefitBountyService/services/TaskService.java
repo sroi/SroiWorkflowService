@@ -75,7 +75,20 @@ public class TaskService {
         taskList = tasks.stream().map(task -> getTaskToFromTask(task)).collect(Collectors.toList());
         return taskList;
     }
+/*lalit start*/
+    public List<Task> getTaskDetailsByApprover(String approver) throws ResourceNotFoundException {
+        Task task = null;
+        List<Task> tskOpnl = taskRepository.findByApprover(approver);
+        if (!tskOpnl.isEmpty()){
 
+            logger.info("Below are Task details: \n"+ tskOpnl );
+        } else {
+            logger.warn("approver with id '" + approver + "' is not present.");
+            throw new ResourceNotFoundException();
+        }
+        return tskOpnl;
+    }
+    /*lalit end*/
 //    private TaskTO getTaskToFromTask(Task task) {
 //
 //    }
