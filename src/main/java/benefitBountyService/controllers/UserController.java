@@ -25,4 +25,20 @@ public class UserController {
     public UserTO getUserById(@RequestParam("uid") String id){
         return userService.getUserDetailsById(id);
     }
+
+    @GetMapping("/get/email")
+    public UserTO getUserByEmail(@RequestParam("email") String email){
+        return userService.getUserByEmail(email);
+    }
+
+    @GetMapping("/get/id")
+    public UserTO getUserByUserId(@RequestParam("userId") String userId){
+        return userService.getUserByUserID(userId);
+    }
+
+    @PostMapping("save")
+    public UserTO saveUser(@RequestBody UserTO userTO) {
+        return userService.saveUser(userTO);
+    }
+
 }

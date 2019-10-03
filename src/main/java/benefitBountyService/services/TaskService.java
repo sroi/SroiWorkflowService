@@ -7,6 +7,7 @@ import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
 import benefitBountyService.models.dtos.TaskTO;
+import benefitBountyService.models.dtos.UserTO;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,7 +221,7 @@ public class TaskService {
             } else {
                 // This is new approver
                 if (!StringUtils.isEmpty(taskTO.getApprover().getEmail())) {
-                    User user = userService.getUserByEmail(taskTO.getApprover().getEmail());
+                    UserTO user = userService.getUserByEmail(taskTO.getApprover().getEmail());
                     if(user != null) {
                         String errMsg = "User already exist with email Id: " + taskTO.getApprover().getEmail() + " for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
                         logger.info(errMsg);

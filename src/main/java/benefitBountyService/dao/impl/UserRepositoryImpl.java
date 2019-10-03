@@ -3,12 +3,14 @@ package benefitBountyService.dao.impl;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 import org.springframework.context.annotation.Bean;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -33,10 +35,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(String id) {
+        /*
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("_id", new ObjectId(id));
+        FindIterable<User> userIter = mongoDbClient.getCollection("users", User.class).find(whereQuery, User.class);
+        User newUser = userIter.first();
+        */
         Document filterUser = new Document();
-        filterUser.append("_id",id);
+        filterUser.append("_id",new ObjectId(id));
         FindIterable<User> userIteration = mongoDbClient.getCollection("users", User.class).find(filterUser,User.class);
-        return userIteration.first();
+        User user = userIteration.first();
+        return user;
     }
 
     @Override

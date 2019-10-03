@@ -49,16 +49,34 @@ public class UserService {
     public UserTO getUserDetailsById(String _id) {
         UserTO userTo = null;
         User user = userRepository.findById(_id);
-        userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
+        if (user != null)
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
         logger.info("Users found: "+ userTo);
         return userTo;
     }
 
-    public User getUserByEmail(String emailId) {
-        User usr = userRepository.findByEmail(emailId);
-        logger.info("Users found for Email Id '"+ emailId +"'.");
-        return usr;
+    public UserTO getUserByEmail(String emailId) {
+        UserTO userTo = null;
+        User user = userRepository.findByEmail(emailId);
+        if (user != null) {
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
+
+            logger.info("Users found for Email Id '" + emailId + "'.");
+        }
+        return userTo;
+    }
+    public UserTO getUserByUserID(String userId) {
+        UserTO userTo = null;
+        User user = userRepository.findByUserId(userId);
+        if (user != null) {
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
+
+            logger.info("Users found for User Id '"+ userId +"'.");
+        }
+        return userTo;
     }
 
     private User saveUser(PTUserTO userTo, User user) {
@@ -88,13 +106,40 @@ public class UserService {
     }
 
     public User saveOrUpdateUser(User user){
-        if (user.getId() == null)
+        if (user.get_id() == null)
             user.set_id(ObjectId.get());
         logger.info("Saving User: " + user);
         return userRepository.save(user);
     }
 
+    public UserTO saveUser(UserTO to){
+        User user = new User();
+        if (to.getId() == null) {
+           /* new User(ObjectId.get(), to.getUserId(), null, to.getName(), to.getEmail(), to.getDetails(), to.getPhoneNo(),
+                    to.getAdmin(), to.getStakeholder(), to.getApprover(), to.getVolunteer());*/
+            user.set_id(ObjectId.get());
+        }
+        user.setUserId(to.getUserId());
+        user.setEmail(to.getEmail());
+        user.setName(to.getName());
+        user.setPhoneNo(to.getPhoneNo());
+        user.setDetails(to.getDetails());
+        user.setApprover(to.getApprover());
+        user.setAdmin(to.getAdmin());
+        user.setStakeholder(to.getStakeholder());
+        user.setVolunteer(to.getVolunteer());
 
+        logger.info("Saving User: " + user);
+        UserTO userTo = null;
+        User savedUser = userRepository.save(user);
+        if (user != null) {
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
+
+            logger.info("Users saved "+ savedUser);
+        }
+        return userTo;
+    }
 
     public User setVolunteer(PTUserTO volunteer) {
         User vol = new User();

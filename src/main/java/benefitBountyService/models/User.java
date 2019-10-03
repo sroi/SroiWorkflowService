@@ -31,11 +31,13 @@ public class User {
     private String approver = Constants.NO;
     @BsonProperty("is_volunteer")
     private String volunteer = Constants.NO;
-//    private String status;
-
 
     public String get_id() {
         return _id.toString();
+    }
+
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 
     public ObjectId getId() {
@@ -43,10 +45,6 @@ public class User {
     }
 
     public void setId(ObjectId _id) {
-        this._id = _id;
-    }
-
-    public void set_id(ObjectId _id) {
         this._id = _id;
     }
 
