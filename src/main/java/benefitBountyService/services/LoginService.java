@@ -34,8 +34,8 @@ public class LoginService {
     public Integer login(LoginTO login) {
         Integer loginStatus = -1;
         try {
-            Optional<User> optUser = userRepository.findByUserId(login.getUsername());
-            User user = optUser.get();
+            User user = userRepository.findByUserId(login.getUsername());
+//            User user = optUser.get();
             if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");

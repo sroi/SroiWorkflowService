@@ -33,9 +33,9 @@ public class TaskService {
 
     public boolean checkTaskById(String taskId){
         boolean found = false;
-        Optional<Task> tskOpnl = taskRepository.findById(taskId);
-        if (tskOpnl.isPresent()){
-            logger.info("Task found. Below are Task details: "+ tskOpnl.get());
+        Task task = taskRepository.findById(taskId);
+        if (task != null){
+            logger.info("Task found. Below are Task details: "+ task);
             found = true;
         }
         return found;
@@ -43,10 +43,10 @@ public class TaskService {
 
     public TaskTO getTaskDetailsById(String taskId) throws ResourceNotFoundException {
         TaskTO taskTO = null;
-        Optional<Task> tskOpnl = taskRepository.findById(taskId);
-        if (tskOpnl.isPresent()){
-            taskTO = getTaskToFromTask(tskOpnl.get());
-            logger.info("Below are Task details: \n"+ taskTO);
+        Task task = taskRepository.findById(taskId);
+        if (task != null){
+            taskTO = getTaskToFromTask(task);
+            logger.info("Task found. Below are Task details: "+ task);
         } else {
             logger.warn("Task with id '" + taskId + "' is not present.");
             throw new TaskNotFoundException("Task not present...");
@@ -194,7 +194,7 @@ public class TaskService {
     private Task updateTaskFromTaskTO(TaskTO taskTO, Map<String, User> userMap) {
         String loggedInUser = "admin";
         Task task = null;
-        Task existingTask = taskRepository.findById(taskTO.getTaskId()).get();
+        Task existingTask = taskRepository.findById(taskTO.getTaskId());
         if (existingTask != null) {
             String apprId = checkAndSaveApprover(taskTO, userMap);
 

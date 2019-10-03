@@ -6,41 +6,56 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.bson.codecs.pojo.annotations.*;
 
-@Document(collection = "users")
+//@Document(collection = "users")
 public class User {
 
-    @Id
+    @BsonId
     private ObjectId _id;
-    @Indexed(unique = true)
-    @Field("user_id")
+//    @Indexed(unique = true)
+    @BsonProperty("user_id")
     private String userId;
     private String password;
     private String name;
     private String email;
     private String details;
-    @Field("phone_no")
+//    @Field("phone_no")
+    @BsonProperty("phone_no")
     private String phoneNo;
-    @Field("is_admin")
+    @BsonProperty("is_admin")
     private String admin = Constants.NO;
-    @Field("is_stakeholder")
+    @BsonProperty("is_stakeholder")
     private String stakeholder = Constants.NO;
-    @Field("is_approver")
+    @BsonProperty("is_approver")
     private String approver = Constants.NO;
-    @Field("is_volunteer")
+    @BsonProperty("is_volunteer")
     private String volunteer = Constants.NO;
 //    private String status;
+
 
     public String get_id() {
         return _id.toString();
     }
 
-    public ObjectId getObjectId() {
+    public ObjectId getId() {
         return _id;
+    }
+
+    public void setId(ObjectId _id) {
+        this._id = _id;
     }
 
     public void set_id(ObjectId _id) {
         this._id = _id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUserId() {

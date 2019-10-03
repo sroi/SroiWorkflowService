@@ -64,34 +64,29 @@ public class ProjectService {
             } else {
                 logger.info("collection 'projects' is empty. Please load some data through 'Create Project' page");
             }
-
+*/
         } catch (MongoException ex) {
             logger.error("Failure while loading projects in Mongo. {}");
         }
         logger.info("Below are projects details... \n" + projectTOs);
-        */
+
         return projectTOs;
     }
 
     public boolean checkProjectById(String projectId){
         boolean found = false;
-        Optional<Project> prjOpnl = projectRepository.findById(projectId);
-        if (prjOpnl.isPresent()){
-            logger.info("Project found. Below are project details: "+prjOpnl.get());
+        Project prjOpnl = projectRepository.findById(projectId);
+        if (prjOpnl != null){
+            logger.info("Project found. Below are project details: "+prjOpnl);
             found = true;
         }
-        /*prjOpnl.ifPresent( prj -> {
-            System.out.println("Value found: "+ prj);
-            found = true;
-        });*/
         return found;
     }
 
     public Project getProjectById(String projectId) throws ResourceNotFoundException {
-        Project project = null;
-        Optional<Project> prjOpnl = projectRepository.findById(projectId);
-        if (prjOpnl.isPresent()){
-            project = prjOpnl.get();
+//        Project project = null;
+        Project project = projectRepository.findById(projectId);
+        if (project != null){
             logger.info("Below are Project details: "+ project);
         } else {
             logger.warn("Project with id '" + projectId + "' is not present.");
@@ -162,8 +157,8 @@ public class ProjectService {
 
         Project project = null;
         if (prjTO.getProjectId() != null) {
-            Optional<Project> prjOpnl = projectRepository.findById(prjTO.getProjectId());
-            project = prjOpnl.isPresent() ? prjOpnl.get() : null;
+            project = projectRepository.findById(prjTO.getProjectId());
+//            project = prjOpnl != null? prjOpnl : null;
         }
         Project savedProj = saveOrUpdateProject(prjTO, project);
         logger.info("Following project has been saved successfully: \n"+savedProj);

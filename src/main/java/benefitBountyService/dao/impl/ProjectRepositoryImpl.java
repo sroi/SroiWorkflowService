@@ -39,4 +39,19 @@ public class ProjectRepositoryImpl implements ProjectRepository {
             return new ArrayList<Project>();
         }
     }
+
+    @Override
+    public Project findById(String projectId) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(String projectId) {
+
+    }
+
+    @Override
+    public Project save(Project prj) {
+        return null;
+    }
 }

@@ -13,7 +13,7 @@ public interface UserRepository {
 
     List<User> findAll();
 
-    void save(User user);
+    User save(User user);
 
-    void saveAll(List<User> usersList);
+    List<User> saveAll(List<User> usersList);
 }

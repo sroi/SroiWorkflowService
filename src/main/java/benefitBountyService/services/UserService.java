@@ -43,7 +43,7 @@ public class UserService {
     }
 
     public User getUserById(String _id) {
-        return userRepository.findById(_id);;
+        return userRepository.findById(_id);
     }
 
     public UserTO getUserDetailsById(String _id) {
@@ -88,7 +88,7 @@ public class UserService {
     }
 
     public User saveOrUpdateUser(User user){
-        if (user.getObjectId() == null)
+        if (user.getId() == null)
             user.set_id(ObjectId.get());
         logger.info("Saving User: " + user);
         return userRepository.save(user);
