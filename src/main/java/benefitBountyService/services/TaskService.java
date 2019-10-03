@@ -12,6 +12,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import com.mongodb.client.model.Aggregates.*;
+
 
 @Service
 public class TaskService {
@@ -44,7 +48,10 @@ public class TaskService {
 
     public TaskTO getTaskDetailsById(String taskId) throws ResourceNotFoundException {
         TaskTO taskTO = null;
-        Task task = taskRepository.findById(taskId);
+//        Task task = taskRepository.findById(taskId);
+        Task task = taskRepository.fetchByUserId(taskId);
+
+        taskRepository.fetchByUserIdT(taskId);
         if (task != null){
             taskTO = getTaskToFromTask(task);
             logger.info("Task found. Below are Task details: "+ task);
@@ -85,14 +92,23 @@ public class TaskService {
         PTUserTO aprTO = getApproverTOForTask(task);
         List<PTUserTO> vols = getVolunteersTOForTask(task);
 
-        TaskTO taskTO = new TaskTO(task.getTaskId(),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
+        TaskTO taskTO = new TaskTO(task.getTaskId().toString(),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
+                aprTO, vols, task.getCreated_by(), task.getCreated_on(), task.getUpdated_by(), task.getUpdated_on());
+        return taskTO;
+    }
+
+    private TaskTO getTaskDetailsByAggregate(Task task){
+        PTUserTO aprTO = getApproverTOForTask(task);
+        List<PTUserTO> vols = getVolunteersTOForTask(task);
+
+        TaskTO taskTO = new TaskTO(task.getTaskId().toString(),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
                 aprTO, vols, task.getCreated_by(), task.getCreated_on(), task.getUpdated_by(), task.getUpdated_on());
         return taskTO;
     }
 
     private List<PTUserTO> getVolunteersTOForTask(Task task) {
         List<PTUserTO> volunteers = null;
-        if (!task.getVolunteers().isEmpty()) {
+        if (task.getVolunteers() != null && task.getVolunteers().isEmpty()) {
             volunteers = task.getVolunteers().stream().map(volId -> getUserTOForTask(volId)).collect(Collectors.toList());
 //            PTUserTO vol = getUserTOForTask()
         } else {
@@ -113,7 +129,7 @@ public class TaskService {
     private PTUserTO getApproverTOForTask(Task task) {
         PTUserTO aprTO = null;
         if (task.getApprover() != null) {
-            aprTO = getUserTOForTask(task.getApprover());
+            aprTO = getUserTOForTask(task.getApprover().toString());
 //            aprTO = new PTUserTO(apr.get_id(), apr.getName(), apr.getEmailId(), apr.getPhoneNo());
         } else {
             logger.info("This task "+ task.getTaskId() +" doesn't have approver");
@@ -186,7 +202,7 @@ public class TaskService {
         List<String> volunteers = checkAndSaveVolunteers(taskTO, userMap);
 
         Task task = new Task(ObjectId.get(),taskTO.getName(), taskTO.getDescription(), taskTO.getProjectId(), taskTO.getActivityLabel(), taskTO.getStartDate(), taskTO.getEndDate(), taskTO.getLocation(),
-                apprId, volunteers, loggedInUser, new Date(), loggedInUser, new Date());
+                new ObjectId(apprId), volunteers, loggedInUser, new Date(), loggedInUser, new Date());
 
         return task;
     }
@@ -202,7 +218,7 @@ public class TaskService {
             List<String> volunteers = checkAndSaveVolunteers(taskTO, userMap);
 
             task = new Task(new ObjectId(taskTO.getTaskId()),taskTO.getName(), taskTO.getDescription(), taskTO.getProjectId(), taskTO.getActivityLabel(), taskTO.getStartDate(), taskTO.getEndDate(), taskTO.getLocation(),
-                    apprId, volunteers, loggedInUser, new Date(), existingTask.getCreated_by(), existingTask.getCreated_on());
+                    new ObjectId(apprId), volunteers, loggedInUser, new Date(), existingTask.getCreated_by(), existingTask.getCreated_on());
         } else {
             String errMsg = "This task is not present in Database for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
             logger.info(errMsg);

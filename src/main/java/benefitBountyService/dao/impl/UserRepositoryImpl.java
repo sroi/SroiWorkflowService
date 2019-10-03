@@ -3,20 +3,10 @@ package benefitBountyService.dao.impl;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClientSettings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
-import org.springframework.context.annotation.Bean;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
-
 import java.util.ArrayList;
 import java.util.List;
 

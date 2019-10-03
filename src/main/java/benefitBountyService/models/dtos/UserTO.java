@@ -1,16 +1,30 @@
 package benefitBountyService.models.dtos;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 public class UserTO {
 
     private String id;
+
+    @Field("user_id")
     private String userId;
     private String name;
     private String email;
+
+    @Field("phone_no")
     private String phoneNo;
     private String details;
+
+    @Field("is_admin")
     private String admin;
+
+    @Field("is_stakeholder")
     private String stakeholder;
+
+    @Field("is_approver")
     private String approver;
+
+    @Field("is_volunteer")
     private String volunteer;
 
     public UserTO() {

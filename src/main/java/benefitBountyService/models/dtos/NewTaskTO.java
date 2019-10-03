@@ -1,35 +1,38 @@
 package benefitBountyService.models.dtos;
 
+import benefitBountyService.models.Project;
+import benefitBountyService.models.User;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class TaskTO {
+public class NewTaskTO {
 
     @Field("_id")
     private String taskId;
     private String name;
     private String description;
     private String projectId;
-    private String activityLabel;
+    private String label;
     private Date startDate;
     private Date endDate;
     private String location;
-    private PTUserTO approver;
-    private List<PTUserTO> volunteers = new ArrayList<>();
+    private List<UserTO> approver_info;
+    private List<String> volunteers = new ArrayList<>();
     private String created_by;
     private Date created_on;
     private String updated_by;
     private Date updated_on;
+    private List<NewProjectTO> proj_info;
 
-    public TaskTO() {
+    /*public NewTaskTO() {
         super();
     }
 
-    public TaskTO(String taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, PTUserTO approver,
-                  List<PTUserTO> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
+    public NewTaskTO(String taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, List<User> approver,
+                     List<String> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -110,19 +113,19 @@ public class TaskTO {
         this.location = location;
     }
 
-    public PTUserTO getApprover() {
+    public List<User> getApprover() {
         return approver;
     }
 
-    public void setApprover(PTUserTO approver) {
+    public void setApprover(List<User> approver) {
         this.approver = approver;
     }
 
-    public List<PTUserTO> getVolunteers() {
+    public List<String> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(List<PTUserTO> volunteers) {
+    public void setVolunteers(List<String> volunteers) {
         this.volunteers = volunteers;
     }
 
@@ -156,25 +159,26 @@ public class TaskTO {
 
     public void setUpdated_on(Date updated_on) {
         this.updated_on = updated_on;
-    }
+    }*/
 
     @Override
     public String toString() {
-        return "TaskTO{" +
-                "taskId=" + taskId +
+        return "NewTaskTO{" +
+                "taskId='" + taskId + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", projectId='" + projectId + '\'' +
-                ", activityLabel='" + activityLabel + '\'' +
+                ", label='" + label + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", location='" + location + '\'' +
-                ", approver='" + approver + '\'' +
+                ", approver_info='" + approver_info + '\'' +
                 ", volunteers=" + volunteers +
                 ", created_by='" + created_by + '\'' +
                 ", created_on=" + created_on +
                 ", updated_by='" + updated_by + '\'' +
                 ", updated_on=" + updated_on +
+                ", project=" + proj_info +
                 '}';
     }
 }

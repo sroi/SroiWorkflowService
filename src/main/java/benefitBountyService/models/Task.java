@@ -1,6 +1,10 @@
 package benefitBountyService.models;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,30 +14,48 @@ import java.util.Date;
 import java.util.List;
 
 @Document(collection = "tasks")
+@BsonDiscriminator
 public class Task {
 
     @Id
     @Field("_id")
+    @BsonId
     private ObjectId taskId;
     private String name;
     private String description;
     private String projectId;
+
     @Field("label")
     @JsonSetter("label")
+    @BsonProperty("label")
     private String activityLabel;
+
     private Date startDate;
     private Date endDate;
     private String location;
-    private String approver;
+    private ObjectId approver;
     private List<String> volunteers;
     private String created_by;
     private Date created_on;
     private String updated_by;
     private Date updated_on;
+    private List<User> approver_details;
 
+    public List<User> getApprover_details() {
+        return approver_details;
+    }
 
+    public void setApprover_details(List<User> approver_details) {
+        this.approver_details = approver_details;
+    }
+
+    public Task(){
+        super();
+    }
+
+//    @BsonCreator
     public Task(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location,
-                String approver, List<String> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
+                ObjectId approver, List<String> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -50,8 +72,8 @@ public class Task {
         this.updated_on = updated_on;
     }
 
-    public String getTaskId() {
-        return taskId.toString();
+    public ObjectId getTaskId() {
+        return taskId;
     }
 
     public void setTaskId(ObjectId taskId) {
@@ -86,7 +108,7 @@ public class Task {
         return activityLabel;
     }
 
-    public void setLabel(String activityLabel) {
+    public void setActivityLabel(String activityLabel) {
         this.activityLabel = activityLabel;
     }
 
@@ -114,11 +136,11 @@ public class Task {
         this.location = location;
     }
 
-    public String getApprover() {
+    public ObjectId getApprover() {
         return approver;
     }
 
-    public void setApprover(String approver) {
+    public void setApprover(ObjectId approver) {
         this.approver = approver;
     }
 

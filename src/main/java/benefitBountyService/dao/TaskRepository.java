@@ -18,4 +18,7 @@ public interface TaskRepository {
 
     Task save(Task task);
     // List<Task> findByTaskName(String name);
+    Task fetchByUserId(String taskId);
+
+    void fetchByUserIdT(String taskId);
 }

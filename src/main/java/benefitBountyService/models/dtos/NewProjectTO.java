@@ -4,10 +4,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 
-public class ProjectTO {
+public class NewProjectTO {
 
 
-//    @Field("_id")
+    @Field("_id")
     private String projectId;
     private String name;
     private String areaOfEngagement;
@@ -17,8 +17,8 @@ public class ProjectTO {
     private Double budget;
     private String corporate;
     private String location;
-    private PTUserTO stakeholder;
-    private PTUserTO pointOfContact;
+    private String stakeholder;
+    private String pointOfContact;
     private String status;
     private Double rating;
 
@@ -34,12 +34,12 @@ public class ProjectTO {
     @Field("updated_by")
     private String updatedBy;
 
-    public ProjectTO() {
+    /*public NewProjectTO() {
         super();
     }
 
-    public ProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location,
-                     PTUserTO stakeholder, PTUserTO pointOfContact, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
+    public NewProjectTO(String projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String corporate, String location,
+                        PTUserTO stakeholder, PTUserTO pointOfContact, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
         this.projectId = projectId;
         this.name = name;
         this.areaOfEngagement = areaOfEngagement;
@@ -194,7 +194,7 @@ public class ProjectTO {
     public void setCreatedOn(Date createdOn) {
         this.createdOn = createdOn;
     }
-
+*/
     @Override
     public String toString() {
         return "ProjectTO{" +
@@ -207,8 +207,8 @@ public class ProjectTO {
                 ", budget=" + budget +
                 ", corporate='" + corporate + '\'' +
                 ", location='" + location + '\'' +
-                ", stakeholder=" + stakeholder +
-                ", pointOfContacts=" + pointOfContact +
+//                ", stakeholder=" + stakeholder +
+//                ", pointOfContacts=" + pointOfContact +
                 ", status='" + status + '\'' +
                 ", rating='" + rating + '\'' +
                 '}';

@@ -45,14 +45,11 @@ public class TaskController {
      */
     @RequestMapping(value = "/task" , method=RequestMethod.GET)
     public TaskTO getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
-        /*if (taskId == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task Id can not be empty");*/
         TaskTO task = null;
         try {
             task = taskService.getTaskDetailsById(taskId);
             return task;
         } catch (ResourceNotFoundException e) {
-//            System.out.println("catch (TaskNotFoundException e)");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This task Id doesn't exist.", e);
         }
     }
