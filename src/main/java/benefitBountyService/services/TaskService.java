@@ -103,8 +103,8 @@ public class TaskService {
     }
 
     private List<PTUserTO> getVolunteersTOForTask(Task task) {
-        List<PTUserTO> volunteers = null;
-        if (!task.getVolunteers().isEmpty()) {
+        List<PTUserTO> volunteers = new ArrayList<>();
+        if (task.getVolunteers() != null && !task.getVolunteers().isEmpty()) {
             volunteers = task.getVolunteers().stream().map(volId -> getUserTOForTask(volId)).collect(Collectors.toList());
 //            PTUserTO vol = getUserTOForTask()
         } else {
