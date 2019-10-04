@@ -1,25 +1,23 @@
 package benefitBountyService.models;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Document(collection = "tasks")
-@BsonDiscriminator
+//@BsonDiscriminator
 public class Task {
 
     @Id
     @Field("_id")
-    @BsonId
+//    @BsonId
     private ObjectId taskId;
     private String name;
     private String description;
@@ -27,7 +25,7 @@ public class Task {
 
     @Field("label")
     @JsonSetter("label")
-    @BsonProperty("label")
+//    @BsonProperty("label")
     private String activityLabel;
 
     private Date startDate;
@@ -39,15 +37,18 @@ public class Task {
     private Date created_on;
     private String updated_by;
     private Date updated_on;
-    private List<User> approver_details;
 
-    public List<User> getApprover_details() {
-        return approver_details;
-    }
+    @BsonIgnore
+    private List<User> approver_details = new ArrayList<>();
 
-    public void setApprover_details(List<User> approver_details) {
-        this.approver_details = approver_details;
-    }
+    @BsonIgnore
+    private User approver_info;
+
+    @BsonIgnore
+    private ArrayList<User> volunteers_info = new ArrayList<>();
+
+    @BsonIgnore
+    private Project project_info;
 
     public Task(){
         super();
@@ -195,12 +196,16 @@ public class Task {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", location='" + location + '\'' +
-                ", approver='" + approver + '\'' +
+                ", approver=" + approver +
                 ", volunteers=" + volunteers +
                 ", created_by='" + created_by + '\'' +
                 ", created_on=" + created_on +
                 ", updated_by='" + updated_by + '\'' +
                 ", updated_on=" + updated_on +
+                ", approver_details=" + approver_details +
+                ", approver_info=" + approver_info +
+                ", volunteers_info=" + volunteers_info +
+                ", project_info=" + project_info +
                 '}';
     }
 }

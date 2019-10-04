@@ -1,12 +1,7 @@
 package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.TaskRepository;
-import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
-import benefitBountyService.models.User;
-import benefitBountyService.models.dtos.NewTaskTO;
-import benefitBountyService.models.dtos.TaskTO;
-import benefitBountyService.models.dtos.TempTO;
 import benefitBountyService.mongodb.MongoDbClient;
 import com.mongodb.Block;
 import com.mongodb.client.AggregateIterable;
@@ -15,16 +10,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import org.bson.BsonDocument;
-import org.bson.BsonObjectId;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.ConvertOperators;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.ArrayList;
@@ -89,7 +81,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 //        ).forEach(task -> System.out.p);
 
 
-        LookupOperation lookupOperation = LookupOperation.newLookup()
+        /*LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("users")
                 .localField("approver")
                 .foreignField("_id")
@@ -114,15 +106,16 @@ public class TaskRepositoryImpl implements TaskRepository {
                 lookupOperation,
                 projStage
         );
+
         NewTaskTO task = mongoTemplate.aggregate(agg, "tasks", NewTaskTO.class).getUniqueMappedResult();
 
         System.out.println("********* task results are " + task);
         TempTO tempTask = mongoTemplate.aggregate(tempAgg, "tasks", TempTO.class).getUniqueMappedResult();
-        /*mongoDbClient.getCollection(collectionName, Task.class).
-                aggregate(Arrays.asList(Aggregates.unwind("approver")));*/
+        *//*mongoDbClient.getCollection(collectionName, Task.class).
+                aggregate(Arrays.asList(Aggregates.unwind("approver")));*//*
         //return tasks.get(0);
 
-        System.out.println("********* tempTask results are " + tempTask);
+        System.out.println("********* tempTask results are " + tempTask);*/
         return new Task();
     }
 
@@ -149,6 +142,39 @@ public class TaskRepositoryImpl implements TaskRepository {
         for (Document out : output) {
             System.out.println("doc printing ....... "+out);
         }
+
+        LookupOperation apprLookupOp = LookupOperation.newLookup()
+                .from("users")
+                .localField("approver")
+                .foreignField("_id")
+                .as("approver_info");
+
+        LookupOperation projLookupOp = LookupOperation.newLookup()
+                .from("projects")
+                .localField("projectId")
+                .foreignField("_id")
+                .as("project_info");
+
+        LookupOperation volLookupOp = LookupOperation.newLookup()
+                .from("users")
+                .localField("volunteers")
+                .foreignField("_id")
+                .as("volunteers_info");
+
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("_id").is(new ObjectId(taskId))),
+                apprLookupOp,
+                Aggregation.unwind("approver_info"),
+                projLookupOp,
+                Aggregation.unwind("project_info"),
+                Aggregation.unwind("volunteers"),
+                volLookupOp,
+                Aggregation.unwind("volunteers_info"),
+                Aggregation.group("_id", "name", "description","volunteers_info")
+        );
+
+        Task task = mongoTemplate.aggregate(agg, "tasks", Task.class).getUniqueMappedResult();
+        System.out.println("********* tempTask results are " + task);
 //        return tasks.get(0);
     }
 
