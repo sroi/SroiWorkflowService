@@ -22,9 +22,5 @@ public interface TaskRepository {
 
     void fetchByUserIdT(String taskId);
 
-    List<Task> getTasksForApprover(String userId);
-
-    List<Task> getTasksForVolunteer(String userId);
-
     List<Task> getTasksPerRoles(String userId, String role);
 }

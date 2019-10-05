@@ -208,60 +208,6 @@ public class TaskRepositoryImpl implements TaskRepository {
         return foundTasks;
     }
 
-    @Override
-    public List<Task> getTasksForApprover(String userId) {
-        List<Task> foundTasks = new ArrayList<>();
-        List<Task> mongoTasks = new ArrayList<>();
-        LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
-
-        LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
-
-        LookupOperation volLookupOp = getLookupOperation("users", "volunteers", "_id", "volunteer_info");
-
-        Aggregation agg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("approver").is(new ObjectId(userId))),
-                apprLookupOp,
-                Aggregation.unwind("$approver_info"),
-                projLookupOp,
-                Aggregation.unwind("$project_info"),
-                Aggregation.unwind("$volunteers"),
-                volLookupOp,
-                Aggregation.unwind("$volunteer_info")
-        );
-
-        mongoTasks = mongoTemplate.aggregate(agg, collectionName, Task.class).getMappedResults();
-
-        foundTasks = groupingTaskByTaskId(mongoTasks);
-        return foundTasks;
-    }
-
-    @Override
-    public List<Task> getTasksForVolunteer(String userId) {
-        List<Task> foundTasks = new ArrayList<>();
-        List<Task> mongoTasks = new ArrayList<>();
-        LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
-
-        LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
-
-        LookupOperation volLookupOp = getLookupOperation("users", "volunteers", "_id", "volunteer_info");
-
-        Aggregation agg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("volunteers").all(new ObjectId(userId))),
-                apprLookupOp,
-                Aggregation.unwind("$approver_info"),
-                projLookupOp,
-                Aggregation.unwind("$project_info"),
-                Aggregation.unwind("$volunteers"),
-                volLookupOp,
-                Aggregation.unwind("$volunteer_info")
-        );
-
-        mongoTasks = mongoTemplate.aggregate(agg, collectionName, Task.class).getMappedResults();
-
-        foundTasks = groupingTaskByTaskId(mongoTasks);
-        return foundTasks;
-    }
-
     // Temporary method to verify lookup operation in java.. to be deleted
     public void fetchByUserIdT(String taskId){
         MongoCollection<Document> taskCollection = mongoDbClient.getCollection("tasks");//, Task.class);

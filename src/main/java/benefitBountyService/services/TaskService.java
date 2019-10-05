@@ -340,12 +340,4 @@ public class TaskService {
         }
         return tasks;
     }
-
-    private List<Task> getTasksForStakeholder(String userId) {
-        return taskRepository.getTasksForVolunteer(userId);
-    }
-
-    private List<Task> getTasksForApprover(String userId) {
-        return taskRepository.getTasksForApprover(userId);
-    }
 }
