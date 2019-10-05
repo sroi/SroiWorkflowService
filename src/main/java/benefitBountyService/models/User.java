@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.bson.codecs.pojo.annotations.*;
 
 @Document(collection = "users")
-@BsonDiscriminator
+//@BsonDiscriminator
 public class User {
 
     @Id
@@ -23,6 +23,7 @@ public class User {
     private String name;
     private String email;
     private String details;
+
     @Field("phone_no")
     @BsonProperty("phone_no")
     private String phoneNo;
@@ -154,30 +155,5 @@ public class User {
                 ", volunteer=" + volunteer +
 //                ", status=" + status +
                 '}';
-    }
-
-    public enum Roles {
-        Admin("Admin"), Approver("Approver"), Stakeholder("Stakeholder"),  Volunteer("Volunteer");
-        private String val;
-        Roles(String val){
-            this.val = val;
-        }
-    }
-
-    public boolean isValidRole(String role) {
-        boolean isValid = false;
-        switch(Roles.valueOf(role)){
-            case Admin:
-                isValid = getAdmin().equals(Constants.YES); break;
-            case Approver:
-                isValid = getApprover().equals(Constants.YES); break;
-            case Stakeholder:
-                isValid = getStakeholder().equals(Constants.YES); break;
-            case Volunteer:
-                isValid = getVolunteer().equals(Constants.YES); break;
-            default:
-                isValid = false;
-        }
-        return isValid;
     }
 }

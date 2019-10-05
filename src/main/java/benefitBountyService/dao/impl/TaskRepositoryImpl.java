@@ -102,10 +102,6 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Task findById(String taskId) {
-        /*Document filterTask = new Document();
-        filterTask.append("_id",new ObjectId(taskId));
-        FindIterable<Task> taskIteration = mongoDbClient.getCollection(collectionName, Task.class).find(filterTask,Task.class);
-        return taskIteration.first();*/
         return mongoTemplate.findById(new ObjectId(taskId), Task.class);
     }
 
@@ -119,7 +115,8 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Task save(Task task) {
-        return null;
+        Task savedTask = mongoTemplate.insert(task);
+        return savedTask;
     }
 
     public Task fetchByTaskId(String taskId){

@@ -4,6 +4,7 @@ package benefitBountyService.services;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.LoginTO;
+import benefitBountyService.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class LoginService {
             if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");
-            } else if (!user.isValidRole(login.getRole())) {
+            } else if (!isValidRole(login.getRole(), user)) {
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong role.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"3");
             } else {
@@ -50,5 +51,22 @@ public class LoginService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "1", ex);
         }
         return loginStatus;
+    }
+
+    public boolean isValidRole(String role, User user) {
+        boolean isValid = false;
+        switch(Constants.ROLES.valueOf(role)){
+            case ADMIN:
+                isValid = user.getAdmin().equals(Constants.YES); break;
+            case APPROVER:
+                isValid = user.getApprover().equals(Constants.YES); break;
+            case STAKEHOLDER:
+                isValid = user.getStakeholder().equals(Constants.YES); break;
+            case VOLUNTEER:
+                isValid = user.getVolunteer().equals(Constants.YES); break;
+            default:
+                isValid = false;
+        }
+        return isValid;
     }
 }

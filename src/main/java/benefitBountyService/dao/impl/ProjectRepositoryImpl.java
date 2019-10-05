@@ -4,6 +4,7 @@ import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
+import benefitBountyService.utils.Constants;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -19,7 +20,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public List<Project> findAll(String userId, String role) {
         MongoCollection<Project> projectCollection = mongoDbClient.getCollection("projects", Project.class);
-        if(role.equals(User.Roles.Admin.name())) {
+        if(role.equals(Constants.ROLES.ADMIN.name())) {
             return projectCollection.aggregate(
                     Arrays.asList(
                             Aggregates.unwind("$admin"),
@@ -27,7 +28,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                             Aggregates.lookup("users","admin","_id", "admin_details"),
                             Aggregates.lookup("users","pointsOfContact", "_id", "pointOfContact_details")
                     )).into(new ArrayList<Project>());
-        } else if (role.equals(User.Roles.Stakeholder.name())) {
+        } else if (role.equals(Constants.ROLES.STAKEHOLDER.name())) {
             return projectCollection.aggregate(
                     Arrays.asList(
                             Aggregates.unwind("$stakeholder"),
