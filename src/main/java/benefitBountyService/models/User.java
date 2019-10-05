@@ -16,6 +16,7 @@ public class User {
     @BsonId
     private ObjectId _id;
 //    @Indexed(unique = true)
+    @Field("user_id")
     @BsonProperty("user_id")
     private String userId;
     private String password;
@@ -50,13 +51,13 @@ public class User {
         this._id = _id;
     }
 
-    public ObjectId getId() {
+    /*public ObjectId getId() {
         return _id;
     }
 
     public void setId(ObjectId _id) {
         this._id = _id;
-    }
+    }*/
 
     public String getEmail() {
         return email;
@@ -96,14 +97,6 @@ public class User {
 
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
-    }
-
-    public String getEmailId() {
-        return email;
-    }
-
-    public void setEmailId(String emailId) {
-        this.email = emailId;
     }
 
     public String getDetails() {

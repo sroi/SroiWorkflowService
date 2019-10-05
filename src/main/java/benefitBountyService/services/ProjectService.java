@@ -123,7 +123,7 @@ public class ProjectService {
         if (userId != null && !userMap.isEmpty()) {
             User user = userMap.get(userId);
             if (user != null)
-                ptUserTO = new PTUserTO(user.get_id(), user.getName(), user.getEmailId(), user.getPhoneNo());
+                ptUserTO = new PTUserTO(user.get_id(), user.getName(), user.getEmail(), user.getPhoneNo());
         }
         return ptUserTO;
     }

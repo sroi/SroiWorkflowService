@@ -14,11 +14,17 @@ public interface TaskRepository {
 
     Task findById(String taskId);
 
-    void deleteById(String taskId);
+    long deleteById(String taskId);
 
     Task save(Task task);
     // List<Task> findByTaskName(String name);
-    Task fetchByUserId(String taskId);
+    Task fetchByTaskId(String taskId);
 
     void fetchByUserIdT(String taskId);
+
+    List<Task> getTasksForApprover(String userId);
+
+    List<Task> getTasksForVolunteer(String userId);
+
+    List<Task> getTasksPerRoles(String userId, String role);
 }

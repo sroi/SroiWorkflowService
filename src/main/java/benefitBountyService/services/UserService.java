@@ -36,7 +36,7 @@ public class UserService {
         if (users.isEmpty()){
             logger.info("Users not found.");
         } else {
-            usersTo = users.parallelStream().map(user -> new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(), user.getPhoneNo(),
+            usersTo = users.parallelStream().map(user -> new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmail(), user.getPhoneNo(),
                     user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer())).collect(Collectors.toList());
         }
         return usersTo;
@@ -50,7 +50,7 @@ public class UserService {
         UserTO userTo = null;
         User user = userRepository.findById(_id);
         if (user != null)
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmailId(),
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmail(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
         logger.info("Users found: "+ userTo);
         return userTo;
@@ -60,7 +60,7 @@ public class UserService {
         UserTO userTo = null;
         User user = userRepository.findByEmail(emailId);
         if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
 
             logger.info("Users found for Email Id '" + emailId + "'.");
@@ -71,7 +71,7 @@ public class UserService {
         UserTO userTo = null;
         User user = userRepository.findByUserId(userId);
         if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
 
             logger.info("Users found for User Id '"+ userId +"'.");
@@ -80,7 +80,7 @@ public class UserService {
     }
 
     private User saveUser(PTUserTO userTo, User user) {
-        user.setEmailId(userTo.getEmail());
+        user.setEmail(userTo.getEmail());
         user.setName(userTo.getName());
         user.setPhoneNo(userTo.getPhoneNo());
         user.setUserId(userTo.getEmail());
@@ -133,7 +133,7 @@ public class UserService {
         UserTO userTo = null;
         User savedUser = userRepository.save(user);
         if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmailId(),
+            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
                     user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
 
             logger.info("Users saved "+ savedUser);
@@ -144,7 +144,7 @@ public class UserService {
     public User setVolunteer(PTUserTO volunteer) {
         User vol = new User();
         vol.set_id(ObjectId.get());
-        vol.setEmailId(volunteer.getEmail());
+        vol.setEmail(volunteer.getEmail());
         vol.setName(volunteer.getName());
         vol.setPhoneNo(volunteer.getPhoneNo());
         vol.setUserId(volunteer.getEmail());

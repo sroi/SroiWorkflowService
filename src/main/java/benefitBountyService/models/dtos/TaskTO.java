@@ -17,8 +17,9 @@ public class TaskTO {
     private Date startDate;
     private Date endDate;
     private String location;
-    private PTUserTO approver;
+    private UserTO approver;
     private List<PTUserTO> volunteers = new ArrayList<>();
+    private String status;
     private String created_by;
     private Date created_on;
     private String updated_by;
@@ -28,8 +29,8 @@ public class TaskTO {
         super();
     }
 
-    public TaskTO(String taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location, PTUserTO approver,
-                  List<PTUserTO> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
+    public TaskTO(String taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location,
+                  UserTO approver, List<PTUserTO> volunteers, String status, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -40,6 +41,7 @@ public class TaskTO {
         this.location = location;
         this.approver = approver;
         this.volunteers = volunteers;
+        this.status = status;
         this.created_by = created_by;
         this.created_on = created_on;
         this.updated_by = updated_by;
@@ -110,11 +112,11 @@ public class TaskTO {
         this.location = location;
     }
 
-    public PTUserTO getApprover() {
+    public UserTO getApprover() {
         return approver;
     }
 
-    public void setApprover(PTUserTO approver) {
+    public void setApprover(UserTO approver) {
         this.approver = approver;
     }
 
@@ -156,6 +158,14 @@ public class TaskTO {
 
     public void setUpdated_on(Date updated_on) {
         this.updated_on = updated_on;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

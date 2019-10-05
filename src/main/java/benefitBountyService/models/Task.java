@@ -1,5 +1,6 @@
 package benefitBountyService.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
@@ -31,21 +32,28 @@ public class Task {
     private Date startDate;
     private Date endDate;
     private String location;
+
+    @JsonIgnore
     private ObjectId approver;
-    private List<String> volunteers;
+
+    @JsonIgnore
+    private List<String> volunteers ;//= new ArrayList<>();
+
+    private String status;
     private String created_by;
     private Date created_on;
     private String updated_by;
     private Date updated_on;
 
     @BsonIgnore
-    private List<User> approver_details = new ArrayList<>();
-
-    @BsonIgnore
     private User approver_info;
 
     @BsonIgnore
-    private ArrayList<User> volunteers_info = new ArrayList<>();
+    private List<User> vols_info = new ArrayList<>();
+
+    @BsonIgnore
+    @JsonIgnore
+    private User volunteer_info;
 
     @BsonIgnore
     private Project project_info;
@@ -56,7 +64,7 @@ public class Task {
 
 //    @BsonCreator
     public Task(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location,
-                ObjectId approver, List<String> volunteers, String created_by, Date created_on, String updated_by, Date updated_on) {
+                ObjectId approver, List<String> volunteers, String status, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -67,14 +75,15 @@ public class Task {
         this.location = location;
         this.approver = approver;
         this.volunteers = volunteers;
+        this.status = status;
         this.created_by = created_by;
         this.created_on = created_on;
         this.updated_by = updated_by;
         this.updated_on = updated_on;
     }
 
-    public ObjectId getTaskId() {
-        return taskId;
+    public String getTaskId() {
+        return taskId.toString();
     }
 
     public void setTaskId(ObjectId taskId) {
@@ -138,7 +147,7 @@ public class Task {
     }
 
     public ObjectId getApprover() {
-        return approver;
+        return approver;//.toString();
     }
 
     public void setApprover(ObjectId approver) {
@@ -185,6 +194,46 @@ public class Task {
         this.updated_on = updated_on;
     }
 
+    public User getVolunteer_info() {
+        return volunteer_info;
+    }
+
+    public void setVolunteer_info(User volunteer_info) {
+        this.volunteer_info = volunteer_info;
+    }
+
+    public List<User> getVols_info() {
+        return vols_info;
+    }
+
+    public void setVols_info(List<User> vols_info) {
+        this.vols_info = vols_info;
+    }
+
+    public User getApprover_info() {
+        return approver_info;
+    }
+
+    public void setApprover_info(User approver_info) {
+        this.approver_info = approver_info;
+    }
+
+    public Project getProject_info() {
+        return project_info;
+    }
+
+    public void setProject_info(Project project_info) {
+        this.project_info = project_info;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -202,9 +251,8 @@ public class Task {
                 ", created_on=" + created_on +
                 ", updated_by='" + updated_by + '\'' +
                 ", updated_on=" + updated_on +
-                ", approver_details=" + approver_details +
                 ", approver_info=" + approver_info +
-                ", volunteers_info=" + volunteers_info +
+                ", volunteers_info=" + volunteer_info +
                 ", project_info=" + project_info +
                 '}';
     }
