@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,33 +111,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserTO saveUser(UserTO to){
-        User user = new User();
-        if (to.getId() == null) {
-           /* new User(ObjectId.get(), to.getUserId(), null, to.getName(), to.getEmail(), to.getDetails(), to.getPhoneNo(),
-                    to.getAdmin(), to.getStakeholder(), to.getApprover(), to.getVolunteer());*/
-            user.set_id(ObjectId.get());
-        }
-        user.setUserId(to.getUserId());
-        user.setEmail(to.getEmail());
-        user.setName(to.getName());
-        user.setPhoneNo(to.getPhoneNo());
-        user.setDetails(to.getDetails());
-        user.setApprover(to.getApprover());
-        user.setAdmin(to.getAdmin());
-        user.setStakeholder(to.getStakeholder());
-        user.setVolunteer(to.getVolunteer());
-
+    public User saveUser(User user){
         logger.info("Saving User: " + user);
-        UserTO userTo = null;
         User savedUser = userRepository.save(user);
-        if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
-                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
-
+        if (savedUser != null) {
             logger.info("Users saved "+ savedUser);
         }
-        return userTo;
+        return savedUser;
     }
 
     public User setVolunteer(PTUserTO volunteer) {

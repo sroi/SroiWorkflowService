@@ -3,16 +3,12 @@ package benefitBountyService.dao.impl;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
@@ -52,10 +48,6 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         User savedUser = mongoTemplate.insert(user, collectionName);
         return savedUser;
-        /*
-        MongoCollection<User> userCollection = mongoDbClient.getCollection("users", User.class);
-        userCollection.insertOne(user);
-        return findById(user.get_id());*/
     }
 
     // this method is not in use... so can be deleted.
