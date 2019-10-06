@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping("/get/email")
     public User getUserByEmail(@RequestParam("email") String email){
-        return userService.getUserByEmailId(email);
+        return userService.getUserByEmail(email);
     }
 
     @GetMapping("/get/id")

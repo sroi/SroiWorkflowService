@@ -2,19 +2,14 @@ package benefitBountyService.controllers;
 
 import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
-import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
-import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.TaskTO;
 import benefitBountyService.services.TaskService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin
@@ -62,7 +57,6 @@ public class TaskController {
      */
     @GetMapping(value = "/task")
     public Task getTasksDetailsByTaskId(@RequestParam("tid") String taskId) {
-        TaskTO taskTO = null;
         Task task = null;
         try {
             task = taskService.getTaskDetailsById(taskId);

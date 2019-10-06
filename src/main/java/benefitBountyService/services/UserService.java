@@ -3,7 +3,6 @@ package benefitBountyService.services;
 import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
-import benefitBountyService.models.dtos.UserTO;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +28,6 @@ public class UserService {
         return users;
     }
 
-    //To be removed if not used in future
-    public List<UserTO> getAllUsers() {
-        List<User> users = getUsers();
-        List<UserTO> usersTo =  null;
-        if (users.isEmpty()){
-            logger.info("Users not found.");
-        } else {
-            usersTo = users.parallelStream().map(user -> new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmail(), user.getPhoneNo(),
-                    user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer())).collect(Collectors.toList());
-        }
-        return usersTo;
-    }
-
     public User getUserById(String _id) {
         return userRepository.findById(_id);
     }
@@ -52,17 +38,7 @@ public class UserService {
         return user;
     }
 
-    //To be removed once removed from TaskService
-    public UserTO getUserByEmail(String emailId) {
-        UserTO userTo = null;
-        User user = userRepository.findByEmail(emailId);
-        if (user != null) {
-            logger.info("Users found for Email Id '" + emailId + "'.");
-        }
-        return userTo;
-    }
-
-    public User getUserByEmailId(String emailId) {
+    public User getUserByEmail(String emailId) {
         User user = userRepository.findByEmail(emailId);
         if (user != null) {
             logger.info("Users found for Email Id '" + emailId + "'.");

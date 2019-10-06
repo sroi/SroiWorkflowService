@@ -7,23 +7,22 @@ import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
 import benefitBountyService.models.dtos.TaskTO;
-import benefitBountyService.models.dtos.UserTO;
 import benefitBountyService.utils.Constants;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import com.mongodb.client.model.Aggregates.*;
 
 
 @Service
@@ -262,7 +261,7 @@ public class TaskService {
             } else {
                 System.out.println("This is new approver");
                 if (!StringUtils.isEmpty(taskTO.getApprover().getEmail())) {
-                    UserTO user = userService.getUserByEmail(taskTO.getApprover().getEmail());
+                    User user = userService.getUserByEmail(taskTO.getApprover().getEmail());
                     if(user != null) {
                         String errMsg = "User already exist with email Id: " + taskTO.getApprover().getEmail() + " for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
                         logger.info(errMsg);
