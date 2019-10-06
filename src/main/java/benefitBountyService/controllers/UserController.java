@@ -35,9 +35,14 @@ public class UserController {
         return userService.getUserByUserID(userId);
     }
 
-    @PostMapping("save")
+    @PostMapping("/save")
     public User saveUser(@RequestBody User user) {
         return userService.saveUser(user);
+    }
+
+    @PostMapping("/saveall")
+    public long saveAllUsers(@RequestBody List<User> users) {
+        return userService.saveAllUsers(users);
     }
 
 }

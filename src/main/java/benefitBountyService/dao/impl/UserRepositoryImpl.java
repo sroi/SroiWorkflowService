@@ -55,9 +55,5 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> saveAll(List<User> users) {
         List<User> savedUsers = (List<User>) mongoTemplate.insert(users, collectionName);
         return savedUsers;
-
-        /*MongoCollection<User> userCollection = mongoDbClient.getCollection("users", User.class);
-        userCollection.insertMany(users);
-        return userCollection.find().into(new ArrayList<User>());*/
     }
 }

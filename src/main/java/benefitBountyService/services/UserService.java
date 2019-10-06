@@ -136,4 +136,10 @@ public class UserService {
         logger.info("Saving Volunteers: " + newVols);
         return userRepository.saveAll(newVols);
     }
+
+    public long saveAllUsers(List<User> users) {
+        int saveStatus = -1;
+        int saveCount = userRepository.saveAll(users).size();
+        return saveCount > 0 ? 0 : saveStatus;
+    }
 }
