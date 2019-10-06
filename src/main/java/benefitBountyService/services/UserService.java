@@ -30,6 +30,7 @@ public class UserService {
         return users;
     }
 
+    //To be removed if not used in future
     public List<UserTO> getAllUsers() {
         List<User> users = getUsers();
         List<UserTO> usersTo =  null;
@@ -46,37 +47,36 @@ public class UserService {
         return userRepository.findById(_id);
     }
 
-    public UserTO getUserDetailsById(String _id) {
-        UserTO userTo = null;
+    public User getUserDetailsById(String _id) {
         User user = userRepository.findById(_id);
-        if (user != null)
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(),user.getEmail(),
-                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
-        logger.info("Users found: "+ userTo);
-        return userTo;
+        logger.info("Users found: "+ user);
+        return user;
     }
 
+    //To be removed once removed from TaskService
     public UserTO getUserByEmail(String emailId) {
         UserTO userTo = null;
         User user = userRepository.findByEmail(emailId);
         if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
-                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
-
             logger.info("Users found for Email Id '" + emailId + "'.");
         }
         return userTo;
     }
-    public UserTO getUserByUserID(String userId) {
-        UserTO userTo = null;
+
+    public User getUserByEmailId(String emailId) {
+        User user = userRepository.findByEmail(emailId);
+        if (user != null) {
+            logger.info("Users found for Email Id '" + emailId + "'.");
+        }
+        return user;
+    }
+
+    public User getUserByUserID(String userId) {
         User user = userRepository.findByUserId(userId);
         if (user != null) {
-            userTo = new UserTO(user.get_id(), user.getUserId(), user.getName(), user.getEmail(),
-                    user.getPhoneNo(), user.getDetails(), user.getAdmin(), user.getStakeholder(), user.getApprover(), user.getVolunteer());
-
             logger.info("Users found for User Id '"+ userId +"'.");
         }
-        return userTo;
+        return user;
     }
 
     private User saveUser(PTUserTO userTo, User user) {

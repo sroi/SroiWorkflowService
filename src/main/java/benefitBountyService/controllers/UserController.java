@@ -1,5 +1,6 @@
 package benefitBountyService.controllers;
 
+import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.UserTO;
 import benefitBountyService.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +18,22 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/all")
-    public List<UserTO> getUsers(){
-        return userService.getAllUsers();
+    public List<User> getUsers(){
+        return userService.getUsers();
     }
 
     @GetMapping("/get")
-    public UserTO getUserById(@RequestParam("uid") String id){
+    public User getUserById(@RequestParam("uid") String id){
         return userService.getUserDetailsById(id);
     }
 
     @GetMapping("/get/email")
-    public UserTO getUserByEmail(@RequestParam("email") String email){
-        return userService.getUserByEmail(email);
+    public User getUserByEmail(@RequestParam("email") String email){
+        return userService.getUserByEmailId(email);
     }
 
     @GetMapping("/get/id")
-    public UserTO getUserByUserId(@RequestParam("userId") String userId){
+    public User getUserByUserId(@RequestParam("userId") String userId){
         return userService.getUserByUserID(userId);
     }
 

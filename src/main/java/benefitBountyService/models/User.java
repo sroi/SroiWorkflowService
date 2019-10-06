@@ -1,6 +1,7 @@
 package benefitBountyService.models;
 
 import benefitBountyService.utils.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -19,6 +20,8 @@ public class User {
     @Field("user_id")
     @BsonProperty("user_id")
     private String userId;
+
+    @JsonIgnore
     private String password;
     private String name;
     private String email;
