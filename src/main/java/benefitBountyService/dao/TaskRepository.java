@@ -1,6 +1,7 @@
 package benefitBountyService.dao;
 
 import benefitBountyService.models.Task;
+import benefitBountyService.models.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.Repository;
@@ -22,5 +23,7 @@ public interface TaskRepository {
 
     void fetchByUserIdT(String taskId);
 
-    List<Task> getTasksPerRoles(String userId, String role);
+    List<Task> getTasksAfterLogin(String userId, String role);
+
+    int changeTaskStatus(User loggedInUser, Task task, String role, String status, String comments, String timeSpent);
 }

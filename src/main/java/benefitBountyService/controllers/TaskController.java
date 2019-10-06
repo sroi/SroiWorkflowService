@@ -110,4 +110,20 @@ public class TaskController {
     public int deleteTask(@RequestParam("tid") String taskId){
         return taskService.deleteTask(taskId);
     }
+
+    /**
+     * Description - To save status of task.
+     * Param - Task (in String format)
+     * Return Value -  int -> 0 - success
+     *                     -> 1 - failed
+     */
+    @PutMapping(value = "/status")
+    public int changeTaskStatus(@RequestParam("tid") String taskId, @RequestParam(value = "role", required = false) String role, @RequestParam("status") String status,
+                                @RequestParam(value="comments", required = false) String comments, @RequestParam(value = "time", required = false) String timeSpent) {
+        int statusChange = -1;
+        statusChange = taskService.changeTaskStatus(taskId, role, status, comments, timeSpent);
+
+        return statusChange;
+    }
+
 }

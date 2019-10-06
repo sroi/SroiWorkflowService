@@ -260,7 +260,7 @@ public class TaskService {
                 appr = userMap.get(taskTO.getApprover().getId());
                 apprId = appr.get_id();//Assuming approver is always present in UserMap
             } else {
-                // This is new approver
+                System.out.println("This is new approver");
                 if (!StringUtils.isEmpty(taskTO.getApprover().getEmail())) {
                     UserTO user = userService.getUserByEmail(taskTO.getApprover().getEmail());
                     if(user != null) {
@@ -330,7 +330,7 @@ public class TaskService {
                 logger.info(errMsg);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
             }*/
-            tasks = taskRepository.getTasksPerRoles(userId, role);
+            tasks = taskRepository.getTasksAfterLogin(userId, role);
             logger.info("Total tasks found : " + tasks.size());
             //tasks = getTasks(userId);
         } else {
@@ -339,5 +339,59 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
         }
         return tasks;
+    }
+
+    public int changeTaskStatus(String taskId, String role, String status, String comments, String timeSpent) {
+        User loggedInUser = new User();// Todo : to be get from session.
+        loggedInUser.setEmail("AnkitaSingh@hotmail.com");
+        loggedInUser.setUserId("AnkitaSingh@hotmail.com");
+        loggedInUser.set_id(new ObjectId("5d89f6721c9d4400001cc5ae"));
+
+        int statusChange = -1;
+        if (ObjectId.isValid(taskId)) {
+            Task taskFound = taskRepository.fetchByTaskId(taskId);
+            if (role.equalsIgnoreCase(Constants.ROLES.APPROVER.toString())) {
+                if (status.equalsIgnoreCase(Constants.STATUS.APPROVED.toString()) || status.equalsIgnoreCase(Constants.STATUS.REJECTED.toString())) {
+                    if (!status.equalsIgnoreCase(taskFound.getStatus())) {
+                        statusChange = taskRepository.changeTaskStatus(loggedInUser, taskFound, role, status, comments, timeSpent);
+                    } else {
+                        String errMsg = "Changing task status from '"+ taskFound.getStatus() + "' to status '" + status+ "' is not allowed.";
+                        logger.info(errMsg);
+                        throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+                    }
+                } else {
+                    String errMsg = "Approver can't change status to " + status;
+                    logger.info(errMsg);
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
+                }
+
+            } else if (role.equalsIgnoreCase(Constants.ROLES.VOLUNTEER.toString())) {
+                String taskStatus = taskFound.getStatus();
+                if (status.equalsIgnoreCase(Constants.STATUS.SUBMITTED.toString())) {
+                    if (taskStatus.equalsIgnoreCase(Constants.STATUS.CREATED.toString()) || taskStatus.equalsIgnoreCase(Constants.STATUS.SUBMITTED.toString())
+                        || taskStatus.equalsIgnoreCase(Constants.STATUS.REJECTED.toString())) {
+                        statusChange = taskRepository.changeTaskStatus(loggedInUser, taskFound, role, status, comments, timeSpent);
+                    } else {
+                        String errMsg = "Changing task status from '"+ taskFound.getStatus() + "' to status '" + status+ "' is not allowed.";
+                        logger.info(errMsg);
+                        throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+                    }
+                } else {
+                    String errMsg = "Volunteer can't change status to " + status;
+                    logger.info(errMsg);
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
+                }
+            } else {
+                String errMsg = "Invalid role is provided for Status change : " + role;
+                logger.info(errMsg);
+                throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+            }
+
+        } else {
+            String errMsg = "Task ID '" + taskId + "' is not valid input.";
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
+        }
+        return statusChange;
     }
 }

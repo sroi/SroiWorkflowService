@@ -8,12 +8,17 @@ public class Constants {
     public static String CR_STATUS = "Created";
     
     public enum STATUS {
-        CREATED("Created"), COMPLETED("Completed"), IN_PROGRESS("In Progress"), SUBMITTED("Submitted");
+        CREATED("Created"), COMPLETED("Completed"), IN_PROGRESS("In Progress"), SUBMITTED("Submitted"), APPROVED("Approved"), REJECTED("Rejected"), ON_HOLD("On Hold");
 
         private String status;
 
         private STATUS (String status) {
             this.status = status;
+        }
+
+        @Override
+        public String toString() {
+            return status;
         }
     }
 
@@ -24,6 +29,11 @@ public class Constants {
 
         private ROLES (String role) {
             this.role = role;
+        }
+
+        @Override
+        public String toString() {
+            return role;
         }
     }
 }

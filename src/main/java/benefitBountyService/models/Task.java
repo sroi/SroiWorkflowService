@@ -40,6 +40,9 @@ public class Task {
     private List<String> volunteers ;//= new ArrayList<>();
 
     private String status;
+
+    @BsonIgnore
+    private Double totalTimeSpent;
     private String created_by;
     private Date created_on;
     private String updated_by;
@@ -57,6 +60,9 @@ public class Task {
 
     @BsonIgnore
     private Project project_info;
+
+    @BsonIgnore
+    private List<Activity> activity_info;
 
     public Task(){
         super();
@@ -232,6 +238,22 @@ public class Task {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<Activity> getActivity_info() {
+        return activity_info;
+    }
+
+    public void setActivity_info(List<Activity> activity_info) {
+        this.activity_info = activity_info;
+    }
+
+    public Double getTotalTimeSpent() {
+        return totalTimeSpent;
+    }
+
+    public void setTotalTimeSpent(Double totalTimeSpent) {
+        this.totalTimeSpent = totalTimeSpent;
     }
 
     @Override
