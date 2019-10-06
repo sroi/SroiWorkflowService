@@ -2,19 +2,16 @@ package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.TaskRepository;
 import benefitBountyService.models.Activity;
-import benefitBountyService.models.Project;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
-import benefitBountyService.services.TaskService;
 import benefitBountyService.utils.Constants;
-import com.mongodb.Block;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.*;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import org.bson.BsonDocument;
-import org.bson.BsonObjectId;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -23,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -58,13 +57,13 @@ public class TaskRepositoryImpl implements TaskRepository {
 
         Aggregation agg = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("projectId").is(new ObjectId(projectId))),
-                apprLookupOp,
-                Aggregation.unwind("$approver_info"),
+                /*apprLookupOp,
+                Aggregation.unwind("$approver_info"),*/
                 projLookupOp,
-                Aggregation.unwind("$project_info"),
-                Aggregation.unwind("$volunteers"),
+                Aggregation.unwind("$project_info")
+                /*Aggregation.unwind("$volunteers"),
                 volLookupOp,
-                Aggregation.unwind("$volunteer_info")
+                Aggregation.unwind("$volunteer_info")*/
         );
 
         mongoTasks = mongoTemplate.aggregate(agg, collectionName, Task.class).getMappedResults();
@@ -125,6 +124,8 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     public Task fetchByTaskId(String taskId){
         Task foundTask = null;
+        Task task = findById(taskId);
+
         LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
 
         LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
@@ -133,27 +134,40 @@ public class TaskRepositoryImpl implements TaskRepository {
 
         LookupOperation activityLookupOp = getLookupOperation("activity_capture", "_id", "taskId", "activity_info");
 
-        Aggregation agg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("_id").is(new ObjectId(taskId))),
-                apprLookupOp,
-                Aggregation.unwind("$approver_info"),
-                projLookupOp,
-                Aggregation.unwind("$project_info"),
-                Aggregation.unwind("$volunteers"),
-                activityLookupOp,
-                volLookupOp,
-                Aggregation.unwind("$volunteer_info")
-        );
+        List<AggregationOperation> list = new ArrayList<>();
+        list.add(Aggregation.match(Criteria.where("_id").is(new ObjectId(taskId))));
+        if (task.getApprover() != null) {
+            list.add(apprLookupOp);
+            list.add(Aggregation.unwind("$approver_info"));
+        }
+        if (task.getProjectId() != null) {
+            list.add(projLookupOp);
+            list.add(Aggregation.unwind("$project_info"));
+        }
+        list.add(activityLookupOp);
+        if (task.getVolunteers()!= null && task.getVolunteers().size() > 0 ) {
+            list.add(Aggregation.unwind("$volunteers"));
+            list.add(volLookupOp);
+            list.add(Aggregation.unwind("$volunteer_info"));
+        }
+        Aggregation newAgg = Aggregation.newAggregation(list);
 
-        List<Task> mongoTasks = mongoTemplate.aggregate(agg, collectionName, Task.class).getMappedResults();
+        /*Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("_id").is(new ObjectId(taskId))), apprLookupOp, Aggregation.unwind("$approver_info"),
+                projLookupOp, Aggregation.unwind("$project_info"), activityLookupOp,
+                Aggregation.unwind("$volunteers"), volLookupOp, Aggregation.unwind("$volunteer_info")
+        );*/
+
+        List<Task> mongoTasks = mongoTemplate.aggregate(newAgg, collectionName, Task.class).getMappedResults();
 
         List<Task> groupedTasks = groupingTaskByTaskId(mongoTasks);
-        foundTask = groupedTasks.get(0);
-
-        Double totalTimeSpent = foundTask.getActivity_info().stream()
-                .filter(act -> act.getRole().equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name()))
-                .collect(Collectors.summingDouble(act -> act.getTimeEntered()));
-        foundTask.setTotalTimeSpent(totalTimeSpent);
+        if (groupedTasks.size() > 0) {
+            foundTask = groupedTasks.get(0);
+            Double totalTimeSpent = foundTask.getActivity_info().stream()
+                    .filter(act -> act.getRole().equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name()))
+                    .collect(Collectors.summingDouble(act -> act.getTimeEntered()));
+            foundTask.setTotalTimeSpent(totalTimeSpent);
+        }
 
         return foundTask;
     }
@@ -184,17 +198,17 @@ public class TaskRepositoryImpl implements TaskRepository {
                     apprLookupOp,
                     Aggregation.unwind("$approver_info"),
                     projLookupOp,
-                    Aggregation.unwind("$project_info"),
-                    Aggregation.unwind("$volunteers"),
+                    Aggregation.unwind("$project_info")
+                    /*Aggregation.unwind("$volunteers"),
                     volLookupOp,
-                    Aggregation.unwind("$volunteer_info")
+                    Aggregation.unwind("$volunteer_info")*/
             );
         } else if (role.equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name())) {
             logger.info("Finding tasks for User '" + userId + "' against Volunteer role");
             agg = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("volunteers").all(new ObjectId(userId))),
-                    apprLookupOp,
-                    Aggregation.unwind("$approver_info"),
+                    /*apprLookupOp,
+                    Aggregation.unwind("$approver_info"),*/
                     projLookupOp,
                     Aggregation.unwind("$project_info"),
                     Aggregation.unwind("$volunteers"),

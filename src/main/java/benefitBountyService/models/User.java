@@ -2,12 +2,12 @@ package benefitBountyService.models;
 
 import benefitBountyService.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.bson.codecs.pojo.annotations.*;
 
 @Document(collection = "users")
 //@BsonDiscriminator
@@ -48,7 +48,7 @@ public class User {
     private String volunteer = Constants.NO;
 
     public String get_id() {
-        return _id.toString();
+        return _id != null ? _id.toString() : null;
     }
 
     public void set_id(ObjectId _id) {

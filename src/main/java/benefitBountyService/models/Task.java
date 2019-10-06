@@ -22,7 +22,7 @@ public class Task {
     private ObjectId taskId;
     private String name;
     private String description;
-    private String projectId;
+    private ObjectId projectId;
 
     @Field("label")
     @JsonSetter("label")
@@ -37,7 +37,7 @@ public class Task {
     private ObjectId approver;
 
     @JsonIgnore
-    private List<String> volunteers ;//= new ArrayList<>();
+    private List<String> volunteers = new ArrayList<>();
 
     private String status;
 
@@ -62,14 +62,14 @@ public class Task {
     private Project project_info;
 
     @BsonIgnore
-    private List<Activity> activity_info;
+    private List<Activity> activity_info = new ArrayList<>();
 
     public Task(){
         super();
     }
 
 //    @BsonCreator
-    public Task(ObjectId taskId, String name, String description, String projectId, String activityLabel, Date startDate, Date endDate, String location,
+    public Task(ObjectId taskId, String name, String description, ObjectId projectId, String activityLabel, Date startDate, Date endDate, String location,
                 ObjectId approver, List<String> volunteers, String status, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
@@ -89,7 +89,7 @@ public class Task {
     }
 
     public String getTaskId() {
-        return taskId.toString();
+        return taskId != null ? taskId.toString() : null;
     }
 
     public void setTaskId(ObjectId taskId) {
@@ -113,10 +113,10 @@ public class Task {
     }
 
     public String getProjectId() {
-        return projectId;
+        return projectId != null ? projectId.toString() : null;
     }
 
-    public void setProjectId(String projectId) {
+    public void setProjectId(ObjectId projectId) {
         this.projectId = projectId;
     }
 
@@ -152,8 +152,8 @@ public class Task {
         this.location = location;
     }
 
-    public ObjectId getApprover() {
-        return approver;//.toString();
+    public String getApprover() {
+        return approver != null ? approver.toString() : null;
     }
 
     public void setApprover(ObjectId approver) {

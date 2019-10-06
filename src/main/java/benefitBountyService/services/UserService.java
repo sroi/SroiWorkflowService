@@ -96,18 +96,18 @@ public class UserService {
         return savedUser;
     }
 
-    public User setVolunteer(PTUserTO volunteer) {
-        User vol = new User();
-        vol.set_id(ObjectId.get());
-        vol.setEmail(volunteer.getEmail());
+    public User setVolunteer(User volunteer) {
+        //User vol = new User();
+        volunteer.set_id(ObjectId.get());
+        /*vol.setEmail(volunteer.getEmail());
         vol.setName(volunteer.getName());
-        vol.setPhoneNo(volunteer.getPhoneNo());
-        vol.setUserId(volunteer.getEmail());
-        vol.setVolunteer("Y");
-        return vol;
+        vol.setPhoneNo(volunteer.getPhoneNo());*/
+        volunteer.setUserId(volunteer.getEmail());
+        volunteer.setVolunteer("Y");
+        return volunteer;
     }
 
-    public List<User> saveVolunteers(List<PTUserTO> vols) {
+    public List<User> saveVolunteers(List<User> vols) {
         List<User> newVols = vols.stream().map(vol -> setVolunteer(vol)).collect(Collectors.toList());
         logger.info("Saving Volunteers: " + newVols);
         return userRepository.saveAll(newVols);

@@ -3,7 +3,6 @@ package benefitBountyService.controllers;
 import benefitBountyService.exceptions.BadInputException;
 import benefitBountyService.exceptions.ResourceNotFoundException;
 import benefitBountyService.models.Task;
-import benefitBountyService.models.dtos.TaskTO;
 import benefitBountyService.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,7 +88,7 @@ public class TaskController {
      *                     -> 1 - failed
      */
     @PostMapping(value = "/create")
-    public int addTask(@RequestBody TaskTO task){
+    public int addTask(@RequestBody Task task){
         return taskService.saveOrUpdate(task);
     }
 
