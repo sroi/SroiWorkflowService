@@ -118,7 +118,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Task save(Task task) {
-        Task savedTask = mongoTemplate.insert(task);
+        Task savedTask = mongoTemplate.save(task);
         return savedTask;
     }
 

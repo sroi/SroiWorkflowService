@@ -227,14 +227,14 @@ public class TaskService {
         Task existingTask = taskRepository.fetchByTaskId(taskTO.getTaskId());
         if (existingTask != null) {
             Map<String, User> userMap = null;
-            if (taskTO.getApprover() != null || !(taskTO.getVolunteers().size() > 0)) {
+            if (taskTO.getApprover() != null || taskTO.getVols_info().size() > 0) {
                 List<User> users = userService.getUsers();
                 if (!users.isEmpty()) {
                     userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
                 }
 
                 apprId = checkAndSaveApprover(taskTO, userMap);
-                if (ObjectId.isValid(apprId)) {
+                if (apprId != null) {
                     approver = new ObjectId(apprId);
                 } else {
                     approver = null;
@@ -247,7 +247,7 @@ public class TaskService {
                 logger.info("Approver and Stakeholder details are not provided while creating Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
             }
             task = new Task(new ObjectId(taskTO.getTaskId()),taskTO.getName(), taskTO.getDescription(), new ObjectId(taskTO.getProjectId()), taskTO.getActivityLabel(), taskTO.getStartDate(),
-                    taskTO.getEndDate(), taskTO.getLocation(), approver, volunteers, taskTO.getStatus(), loggedInUser, new Date(), existingTask.getCreated_by(), existingTask.getCreated_on());
+                    taskTO.getEndDate(), taskTO.getLocation(), approver, volunteers, taskTO.getStatus(), existingTask.getCreated_by(), existingTask.getCreated_on(), loggedInUser, new Date());
 
         } else {
             String errMsg = "This task is not present in Database for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId();
