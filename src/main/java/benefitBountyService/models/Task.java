@@ -18,17 +18,13 @@ public class Task {
 
     @Id
     @Field("_id")
-//    @BsonId
     private ObjectId taskId;
     private String name;
     private String description;
     private String projectId;
-
     @Field("label")
     @JsonSetter("label")
-//    @BsonProperty("label")
     private String activityLabel;
-
     private Date startDate;
     private Date endDate;
     private String location;

@@ -8,6 +8,7 @@ import benefitBountyService.models.User;
 import benefitBountyService.mongodb.MongoDbClient;
 import benefitBountyService.services.TaskService;
 import benefitBountyService.utils.Constants;
+import benefitBountyService.utils.LookupUtility;
 import com.mongodb.Block;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
@@ -48,22 +49,17 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public List<Task> findByProjectId(String projectId) {
 
-        List<Task> foundTasks = new ArrayList<>();
-        List<Task> mongoTasks = new ArrayList<>();
-        LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
-
-        LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
-
-        LookupOperation volLookupOp = getLookupOperation("users", "volunteers", "_id", "volunteer_info");
+        List<Task> foundTasks;
+        List<Task> mongoTasks;
 
         Aggregation agg = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("projectId").is(new ObjectId(projectId))),
-                apprLookupOp,
+                LookupUtility.getLookupOperation("users", "approver", "_id", "approver_info"),
                 Aggregation.unwind("$approver_info"),
-                projLookupOp,
-                Aggregation.unwind("$project_info"),
+                LookupUtility.getLookupOperation("projects", "projectId", "_id", "project_info"),
+                Aggregation.unwind("$project_info"), // @AskAbhijeet - why unwind on project_info? For every task there will be only one project, no?
                 Aggregation.unwind("$volunteers"),
-                volLookupOp,
+                LookupUtility.getLookupOperation("users", "volunteers", "_id", "volunteer_info"),
                 Aggregation.unwind("$volunteer_info")
         );
 
@@ -82,14 +78,10 @@ public class TaskRepositoryImpl implements TaskRepository {
             groupedTaskMap.forEach((k, v) -> createVolsInfo(v));
         }
         groupedTaskMap.forEach((k, v) -> groupedTask.add(v.get(0)));
-        /*for(int pos=0; pos < mongoTasks.size(); pos += 2) {
-            groupedTask.add(mongoTasks.get(pos));
-        }*/
         return groupedTask;
     }
 
     private List<Task> createVolsInfo(List<Task> tasks) {
-        Task fTask = null;
         List<User> vols = new ArrayList<>();
         tasks.forEach(task -> vols.add(task.getVolunteer_info()));
         if (tasks.size() > 0) {
@@ -125,23 +117,16 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     public Task fetchByTaskId(String taskId){
         Task foundTask = null;
-        LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
-
-        LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
-
-        LookupOperation volLookupOp = getLookupOperation("users", "volunteers", "_id", "volunteer_info");
-
-        LookupOperation activityLookupOp = getLookupOperation("activity_capture", "_id", "taskId", "activity_info");
 
         Aggregation agg = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("_id").is(new ObjectId(taskId))),
-                apprLookupOp,
+                LookupUtility.getLookupOperation("users", "approver", "_id", "approver_info"),
                 Aggregation.unwind("$approver_info"),
-                projLookupOp,
+                LookupUtility.getLookupOperation("projects", "projectId", "_id", "project_info"),
                 Aggregation.unwind("$project_info"),
                 Aggregation.unwind("$volunteers"),
-                activityLookupOp,
-                volLookupOp,
+                LookupUtility.getLookupOperation("activity_capture", "_id", "taskId", "activity_info"),
+                LookupUtility.getLookupOperation("users", "volunteers", "_id", "volunteer_info"),
                 Aggregation.unwind("$volunteer_info")
         );
 
@@ -158,47 +143,34 @@ public class TaskRepositoryImpl implements TaskRepository {
         return foundTask;
     }
 
-    private LookupOperation getLookupOperation(String from , String localField, String foreignField, String as) {
-        return LookupOperation.newLookup()
-                .from(from)
-                .localField(localField)
-                .foreignField(foreignField)
-                .as(as);
-    }
-
     @Override
     public List<Task> getTasksAfterLogin(String userId, String role) {
-        List<Task> foundTasks = new ArrayList<>();
-        List<Task> mongoTasks = new ArrayList<>();
-        LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
-
-        LookupOperation projLookupOp = getLookupOperation("projects", "projectId", "_id", "project_info");
-
-        LookupOperation volLookupOp = getLookupOperation("users", "volunteers", "_id", "volunteer_info");
+        List<Task> foundTasks;
+        List<Task> mongoTasks;
 
         Aggregation agg = null;
         if (role.equalsIgnoreCase(Constants.ROLES.APPROVER.name())) {
             logger.info("Finding tasks for User '" + userId + "' against Approver role");
             agg = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("approver").is(new ObjectId(userId))),
-                    apprLookupOp,
+                    LookupUtility.getLookupOperation("users", "approver", "_id", "approver_info"),
                     Aggregation.unwind("$approver_info"),
-                    projLookupOp,
+                    LookupUtility.getLookupOperation("projects", "projectId", "_id", "project_info"),
                     Aggregation.unwind("$project_info"),
                     Aggregation.unwind("$volunteers"),
-                    volLookupOp,
+                    LookupUtility.getLookupOperation("users", "volunteers", "_id", "volunteer_info"),
                     Aggregation.unwind("$volunteer_info")
             );
         } else if (role.equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name())) {
             logger.info("Finding tasks for User '" + userId + "' against Volunteer role");
             agg = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("volunteers").all(new ObjectId(userId))),
-                    apprLookupOp,
+                    LookupUtility.getLookupOperation("users", "approver", "_id", "approver_info"),
                     Aggregation.unwind("$approver_info"),
-                    projLookupOp,
+                    LookupUtility.getLookupOperation("projects", "projectId", "_id", "project_info"),
                     Aggregation.unwind("$project_info"),
                     Aggregation.unwind("$volunteers"),
-                    volLookupOp,
+                    LookupUtility.getLookupOperation("users", "volunteers", "_id", "volunteer_info"),
                     Aggregation.unwind("$volunteer_info")
             );
         } else {
