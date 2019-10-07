@@ -6,7 +6,6 @@ import benefitBountyService.exceptions.TaskNotFoundException;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
-import benefitBountyService.models.dtos.TaskTO;
 import benefitBountyService.utils.Constants;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -48,11 +47,8 @@ public class TaskService {
 
     public Task getTaskDetailsById(String taskId) throws ResourceNotFoundException {
         if (ObjectId.isValid(taskId)) {
-            TaskTO taskTO = null;
-//        Task task = taskRepository.findById(taskId);
             Task task = taskRepository.fetchByTaskId(taskId);
             if (task != null) {
-//            taskTO = getTaskToFromTask(task);
                 logger.info("Task found. Below are Task details: " + task);
             } else {
                 logger.warn("Task with id '" + taskId + "' is not present.");
@@ -66,46 +62,25 @@ public class TaskService {
         }
     }
 
-    public List<TaskTO> getTasksDetailsByName(String name) throws ResourceNotFoundException{
-        List<Task> tasks =  null;
-        List<TaskTO> taskTOList = null;
-        tasks = taskRepository.findByName(name);
+    public List<Task> getTasksDetailsByName(String name) throws ResourceNotFoundException{
+        List<Task> tasks = taskRepository.findByName(name);
         if(tasks.isEmpty()) {
             logger.info("Task with name '" + name + "' doesn't exist.");
             throw new ResourceNotFoundException();
-        } else {
-            taskTOList = tasks.parallelStream().map(task -> getTaskToFromTask(task)).collect(Collectors.toList());
-            logger.info("Below Tasks are found: \n" + taskTOList);
         }
-
-        return taskTOList;
+        return tasks;
     }
 
     public List<Task> getTasksDetailsByProject(String projectId) throws ResourceNotFoundException{
-        List<TaskTO> taskList = null;
         List<Task> tasks = null;
         if (ObjectId.isValid(projectId)) {
-            tasks = getTasks(projectId);
-//            taskList = tasks.stream().map(task -> getTaskToFromTask(task)).collect(Collectors.toList());
+            tasks = taskRepository.findByProjectId(projectId);;
         } else {
             String errMsg = "Project ID '" + projectId + "' is not valid input.";
             logger.info(errMsg);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
         }
         return tasks;
-    }
-
-//    private TaskTO getTaskToFromTask(Task task) {
-//
-//    }
-
-    private TaskTO getTaskToFromTask(Task task){
-        PTUserTO aprTO = getApproverTOForTask(task);
-//        List<PTUserTO> vols = getVolunteersTOForTask(task);
-
-        TaskTO taskTO = new TaskTO(task.getTaskId().toString(),task.getName(), task.getDescription(), task.getProjectId(), task.getActivityLabel(), task.getStartDate(), task.getEndDate(), task.getLocation(),
-                null, null, task.getStatus(), task.getCreated_by(), task.getCreated_on(), task.getUpdated_by(), task.getUpdated_on());
-        return taskTO;
     }
 
     private List<PTUserTO> getVolunteersTOForTask(Task task) {
@@ -132,7 +107,6 @@ public class TaskService {
         PTUserTO aprTO = null;
         if (task.getApprover() != null) {
             aprTO = getUserTOForTask(task.getApprover().toString());
-//            aprTO = new PTUserTO(apr.get_id(), apr.getName(), apr.getEmailId(), apr.getPhoneNo());
         } else {
             logger.info("This task "+ task.getTaskId() +" doesn't have approver");
         }
@@ -346,25 +320,10 @@ public class TaskService {
     }
 
     public List<Task> getTasksDetailsByLogin(String userId, String role) {
-        List<TaskTO> taskList = null;
         List<Task> tasks = null;
         if (ObjectId.isValid(userId)) {
-            /*if (role.equalsIgnoreCase(Constants.ROLES.APPROVER.name())) {
-                logger.info("Finding tasks for User '" + userId + "' against Approver role");
-                tasks = getTasksForApprover(userId);
-                logger.info("Total tasks found : " + tasks.size());
-            } else if (role.equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name())) {
-                logger.info("Finding tasks for User '" + userId + "' against Volunteer role");
-                tasks = getTasksForStakeholder(userId);
-                logger.info("Total tasks found : " + tasks.size());
-            } else {
-                String errMsg = role + " is incorrect role to see tasks";
-                logger.info(errMsg);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
-            }*/
             tasks = taskRepository.getTasksAfterLogin(userId, role);
             logger.info("Total tasks found : " + tasks.size());
-            //tasks = getTasks(userId);
         } else {
             String errMsg = "User ID '" + userId + "' is not valid input.";
             logger.info(errMsg);

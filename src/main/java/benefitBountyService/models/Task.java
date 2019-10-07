@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -52,6 +53,7 @@ public class Task {
     private User approver_info;
 
     @BsonIgnore
+    @Transient
     private List<User> vols_info = new ArrayList<>();
 
     @BsonIgnore
@@ -61,6 +63,7 @@ public class Task {
     @BsonIgnore
     private Project project_info;
 
+    //Todo : to fix issue while serializing. @Transient is not working here as while displaying result to ui it removes activity_info field
     @BsonIgnore
     private List<Activity> activity_info = new ArrayList<>();
 

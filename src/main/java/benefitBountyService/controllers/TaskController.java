@@ -71,8 +71,8 @@ public class TaskController {
      * Return Value -  Return list of tasks
      */
     /*@GetMapping(value = "/tasks/name" , method=RequestMethod.GET)
-    public List<TaskTO> getTasksDetailsByName(@RequestParam("tname") String taskName){
-        List<TaskTO> tasks = null;
+    public List<Task> getTasksDetailsByName(@RequestParam("tname") String taskName){
+        List<Task> tasks = null;
         try{
             tasks = taskService.getTasksDetailsByName(taskName);
         } catch (ResourceNotFoundException e) {

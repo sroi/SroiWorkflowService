@@ -125,6 +125,9 @@ public class TaskRepositoryImpl implements TaskRepository {
     public Task fetchByTaskId(String taskId){
         Task foundTask = null;
         Task task = findById(taskId);
+        if (task == null) {
+            return foundTask;
+        }
 
         LookupOperation apprLookupOp = getLookupOperation("users", "approver", "_id", "approver_info");
 
