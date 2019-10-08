@@ -224,7 +224,7 @@ public class TaskService {
         ObjectId approver = null;
         List<String> volunteers = null;
 
-        Task existingTask = taskRepository.fetchByTaskId(taskTO.getTaskId());
+        Task existingTask = taskRepository.findById(taskTO.getTaskId());
         if (existingTask != null) {
             Map<String, User> userMap = null;
             if (taskTO.getApprover() != null || taskTO.getVols_info().size() > 0) {
