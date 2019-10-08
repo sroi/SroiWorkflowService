@@ -1,5 +1,6 @@
 package benefitBountyService.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
@@ -66,6 +67,9 @@ public class Task {
     //Todo : to fix issue while serializing. @Transient is not working here as while displaying result to ui it removes activity_info field
     @BsonIgnore
     private List<Activity> activity_info = new ArrayList<>();
+
+    @BsonIgnore
+    private Activity activity;
 
     public Task(){
         super();
@@ -257,6 +261,12 @@ public class Task {
 
     public void setTotalTimeSpent(Double totalTimeSpent) {
         this.totalTimeSpent = totalTimeSpent;
+    }
+
+    @JsonGetter("duration")
+    public String duration() {
+        String duration = String.valueOf(((endDate.getTime() - startDate.getTime())/3600000));
+        return duration;
     }
 
     @Override

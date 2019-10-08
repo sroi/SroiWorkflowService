@@ -148,6 +148,7 @@ public class TaskRepositoryImpl implements TaskRepository {
             list.add(Aggregation.unwind("$project_info"));
         }
         list.add(activityLookupOp);
+        //list.add(Aggregation.unwind("$activity"));
         if (task.getVolunteers()!= null && task.getVolunteers().size() > 0 ) {
             list.add(Aggregation.unwind("$volunteers"));
             list.add(volLookupOp);
@@ -210,8 +211,8 @@ public class TaskRepositoryImpl implements TaskRepository {
             logger.info("Finding tasks for User '" + userId + "' against Volunteer role");
             agg = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("volunteers").all(new ObjectId(userId))),
-                    /*apprLookupOp,
-                    Aggregation.unwind("$approver_info"),*/
+                    apprLookupOp,
+                    Aggregation.unwind("$approver_info"),
                     projLookupOp,
                     Aggregation.unwind("$project_info"),
                     Aggregation.unwind("$volunteers"),
@@ -254,7 +255,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
         Activity activity = mongoTemplate.findOne(actQuery, Activity.class);
         if (activity != null) {
-            Double timeSpent = timeEntered != null ? Double.parseDouble(timeEntered) + activity.getTimeEntered() : activity.getTimeEntered();
+            Double timeSpent = timeEntered != null ? Double.parseDouble(timeEntered) : 0.0; //+ activity.getTimeEntered() : activity.getTimeEntered();
             activity.setStatus(Constants.STATUS.SUBMITTED.toString());
             activity.setComments(comments);
             activity.setTimeEntered(timeSpent);
