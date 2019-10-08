@@ -329,13 +329,16 @@ public class TaskRepositoryImpl implements TaskRepository {
                         .andOperator(Criteria.where("userId").is(new ObjectId(loggedInUser.get_id())))));
 
         Activity activity = mongoTemplate.findOne(actQuery, Activity.class);
+        String activityStr = "Task has been "+status.toLowerCase();
         if (activity != null) {
             activity.setComments(comments);
             activity.setUpdatedBy(loggedInUser.getUserId());
             activity.setUpdatedOn(new Date());
+            activity.setActivity(activityStr);
         } else {
+
             activity = new Activity(ObjectId.get(), new ObjectId(upTask.getProjectId()), new ObjectId(task.getTaskId()), new ObjectId(loggedInUser.get_id()), loggedInUser.getName(), Constants.ROLES.APPROVER.toString(),
-                    comments, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
+                    activityStr, comments, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
         }
 
         Activity act = mongoTemplate.save(activity);
