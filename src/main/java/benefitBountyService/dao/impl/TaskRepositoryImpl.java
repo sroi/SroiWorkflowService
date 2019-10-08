@@ -238,6 +238,9 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public int changeTaskStatus(User loggedInUser, Task task, String role, String status, String comments, String timeSpent) {
         User user = userRepository.findByUserId(loggedInUser.getUserId());
+        if (user == null) {
+            user = loggedInUser;
+        }
         int changeStatus = -1;
         if (role.equalsIgnoreCase(Constants.ROLES.APPROVER.toString())) {
             changeStatus = changeTaskStatusForApprover(user, task, status, comments);

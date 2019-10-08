@@ -334,10 +334,10 @@ public class TaskService {
 
     public int changeTaskStatus(String taskId, String role, String status, String comments, String timeSpent) {
         User loggedInUser = new User();// Todo : to be get from session.
-        loggedInUser.setEmail("AnkitaSingh@hotmail.com");
-        loggedInUser.setUserId("AnkitaSingh@hotmail.com");
-        loggedInUser.setName("Ankita SetName");
-        loggedInUser.set_id(new ObjectId("5d89f6721c9d4400001cc5ae"));
+        loggedInUser.setEmail("sawannai@gmail.com");
+        loggedInUser.setUserId("sawannai@gmail.com");
+        loggedInUser.setName("sawan nai");
+        loggedInUser.set_id(new ObjectId("5d9984b61c9d440000d024be"));
 
         int statusChange = -1;
         if (ObjectId.isValid(taskId)) {
