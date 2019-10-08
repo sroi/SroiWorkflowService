@@ -168,7 +168,7 @@ public class TaskRepositoryImpl implements TaskRepository {
         if (groupedTasks.size() > 0) {
             foundTask = groupedTasks.get(0);
             Double totalTimeSpent = foundTask.getActivity_info().stream()
-                    .filter(act -> act.getRole().equalsIgnoreCase(Constants.ROLES.VOLUNTEER.name()))
+                    .filter(act -> act.getRole().equalsIgnoreCase(Constants.ROLES.VOLUNTEER.toString()))
                     .collect(Collectors.summingDouble(act -> act.getTimeEntered()));
             foundTask.setTotalTimeSpent(totalTimeSpent);
         }

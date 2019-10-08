@@ -116,7 +116,7 @@ public class Activity {
     }
 
     public Double getTimeEntered() {
-        return timeEntered;
+        return timeEntered != null ? timeEntered : 0.0;
     }
 
     public void setTimeEntered(Double timeEntered) {
