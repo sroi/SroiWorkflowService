@@ -14,6 +14,7 @@ public class Activity {
     private ObjectId projectId;
     private ObjectId taskId;
     private ObjectId userId;
+    private String userName;
     private String role;
     private String activity;
     private String comments;
@@ -29,12 +30,13 @@ public class Activity {
         super();
     }
 
-    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String role, String comments, Double timeEntered,
+    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String userName, String role, String comments, Double timeEntered,
                     String status, String createdBy, Date createdOn, String updatedBy, Date updatedOn) {
         this._id = _id;
         this.projectId = projectId;
         this.taskId = taskId;
         this.userId = userId;
+        this.userName = userName;
         this.role = role;
         this.comments = comments;
         this.timeEntered = timeEntered;
@@ -45,12 +47,13 @@ public class Activity {
         this.updatedOn = updatedOn;
     }
 
-    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String role, String comments, String createdBy, Date createdOn,
+    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String userName, String role, String comments, String createdBy, Date createdOn,
                     String updatedBy, Date updatedOn) {
         this._id = _id;
         this.projectId = projectId;
         this.taskId = taskId;
         this.userId = userId;
+        this.userName = userName;
         this.role = role;
         this.comments = comments;
         this.createdBy = createdBy;
@@ -163,6 +166,14 @@ public class Activity {
         this.updatedOn = updatedOn;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
         return "Activity{" +
@@ -170,10 +181,11 @@ public class Activity {
                 ", projectId=" + projectId +
                 ", taskId=" + taskId +
                 ", userId=" + userId +
+                ", userName='" + userName + '\'' +
                 ", role='" + role + '\'' +
                 ", activity='" + activity + '\'' +
                 ", comments='" + comments + '\'' +
-                ", timeEntered='" + timeEntered + '\'' +
+                ", timeEntered=" + timeEntered +
                 ", status='" + status + '\'' +
                 ", createdBy='" + createdBy + '\'' +
                 ", updatedBy='" + updatedBy + '\'' +

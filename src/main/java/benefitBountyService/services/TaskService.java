@@ -336,6 +336,7 @@ public class TaskService {
         User loggedInUser = new User();// Todo : to be get from session.
         loggedInUser.setEmail("AnkitaSingh@hotmail.com");
         loggedInUser.setUserId("AnkitaSingh@hotmail.com");
+        loggedInUser.setName("Ankita SetName");
         loggedInUser.set_id(new ObjectId("5d89f6721c9d4400001cc5ae"));
 
         int statusChange = -1;

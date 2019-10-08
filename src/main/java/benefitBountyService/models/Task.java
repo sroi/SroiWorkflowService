@@ -68,9 +68,6 @@ public class Task {
     @BsonIgnore
     private List<Activity> activity_info = new ArrayList<>();
 
-    @BsonIgnore
-    private Activity activity;
-
     public Task(){
         super();
     }

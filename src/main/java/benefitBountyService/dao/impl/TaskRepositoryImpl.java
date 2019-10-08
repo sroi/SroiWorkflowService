@@ -1,6 +1,7 @@
 package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.TaskRepository;
+import benefitBountyService.dao.UserRepository;
 import benefitBountyService.models.Activity;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
@@ -40,6 +41,9 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private final String collectionName = "tasks";
     private final String activityCollection = "activity_capture";
@@ -147,13 +151,13 @@ public class TaskRepositoryImpl implements TaskRepository {
             list.add(projLookupOp);
             list.add(Aggregation.unwind("$project_info"));
         }
-        list.add(activityLookupOp);
-        //list.add(Aggregation.unwind("$activity"));
         if (task.getVolunteers()!= null && task.getVolunteers().size() > 0 ) {
             list.add(Aggregation.unwind("$volunteers"));
             list.add(volLookupOp);
             list.add(Aggregation.unwind("$volunteer_info"));
         }
+        list.add(activityLookupOp);
+//        list.add(Aggregation.unwind("$activity"));
         Aggregation newAgg = Aggregation.newAggregation(list);
 
         /*Aggregation agg = Aggregation.newAggregation(
@@ -233,11 +237,12 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public int changeTaskStatus(User loggedInUser, Task task, String role, String status, String comments, String timeSpent) {
+        User user = userRepository.findByUserId(loggedInUser.getUserId());
         int changeStatus = -1;
         if (role.equalsIgnoreCase(Constants.ROLES.APPROVER.toString())) {
-            changeStatus = changeTaskStatusForApprover(loggedInUser, task, status, comments);
+            changeStatus = changeTaskStatusForApprover(user, task, status, comments);
         } else {
-            changeStatus = changeTaskStatusForVolunteer(loggedInUser, task, status, comments, timeSpent);
+            changeStatus = changeTaskStatusForVolunteer(user, task, status, comments, timeSpent);
         }
 
         return changeStatus;
@@ -263,7 +268,7 @@ public class TaskRepositoryImpl implements TaskRepository {
             activity.setUpdatedOn(new Date());
         } else {
             Double timeSpent = timeEntered != null ? Double.parseDouble(timeEntered) : 0.0 ;
-            activity = new Activity(ObjectId.get(), new ObjectId(task.getProjectId()), new ObjectId(task.getTaskId()), new ObjectId(loggedInUser.get_id()), Constants.ROLES.VOLUNTEER.toString(),
+            activity = new Activity(ObjectId.get(), new ObjectId(task.getProjectId()), new ObjectId(task.getTaskId()), new ObjectId(loggedInUser.get_id()), loggedInUser.getName(), Constants.ROLES.VOLUNTEER.toString(),
                     comments, timeSpent, status, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
         }
         Activity act = mongoTemplate.save(activity);
@@ -326,7 +331,7 @@ public class TaskRepositoryImpl implements TaskRepository {
             activity.setUpdatedBy(loggedInUser.getUserId());
             activity.setUpdatedOn(new Date());
         } else {
-            activity = new Activity(ObjectId.get(), new ObjectId(upTask.getProjectId()), new ObjectId(task.getTaskId()), new ObjectId(loggedInUser.get_id()), Constants.ROLES.APPROVER.toString(),
+            activity = new Activity(ObjectId.get(), new ObjectId(upTask.getProjectId()), new ObjectId(task.getTaskId()), new ObjectId(loggedInUser.get_id()), loggedInUser.getName(), Constants.ROLES.APPROVER.toString(),
                     comments, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
         }
 
