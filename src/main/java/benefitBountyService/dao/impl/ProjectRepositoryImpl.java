@@ -4,6 +4,7 @@ import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.models.Project;
 import benefitBountyService.utils.Constants;
 import benefitBountyService.utils.MongoDbUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -42,7 +43,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public Project findById(String projectId) {
-        return null;
+        return mongoTemplate.findById(new ObjectId(projectId), Project.class);
     }
 
     @Override
@@ -52,6 +53,6 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public Project save(Project prj) {
-        return null;
+        return mongoTemplate.save(prj, collectionName);
     }
 }

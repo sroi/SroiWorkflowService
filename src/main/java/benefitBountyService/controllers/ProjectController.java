@@ -71,9 +71,11 @@ public class ProjectController {
      *                     -> 1 - failed- Task not found. Please refresh Task table.
      *                     -> 2 - failed- Task can not be updated. It is in <state> state.
      */
-    @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
-    public int updateProjectStatus(@RequestParam("pid") String projectId, @RequestParam("status") String status){
-        return projectService.updateProjectStatus(projectId, status);
+    @PostMapping(value = "/status")
+    public int updateProjectStatus(@RequestParam("pid") String projectId,
+                                   @RequestParam("status") String status,
+                                   @RequestParam(value = "role", required = false) String role){
+        return projectService.updateProjectStatus(projectId, status, role);
     }
 
 }
