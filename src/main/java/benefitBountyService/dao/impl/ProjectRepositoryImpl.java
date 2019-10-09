@@ -55,12 +55,19 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     }
 
     @Override
-    public void deleteById(String projectId) {
-
+    public long deleteById(String projectId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(new ObjectId(projectId)));
+        return mongoTemplate.remove(query, collectionName).getDeletedCount();
     }
 
     @Override
     public Project save(Project prj) {
         return mongoTemplate.save(prj, collectionName);
+    }
+
+    @Override
+    public List<Project> getAllProjects() {
+        return mongoTemplate.findAll(Project.class, collectionName);
     }
 }

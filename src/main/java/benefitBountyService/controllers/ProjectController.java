@@ -18,7 +18,7 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 	
-	@RequestMapping(value = "/all" , method=RequestMethod.GET)
+	@GetMapping(value = "/all")
 	public List<Project> getProjects(@RequestParam("user_id") String userId, @RequestParam("Role") String role) {
         List<Project> projects = projectService.getProjects(userId, role);
         return projects;
@@ -58,7 +58,7 @@ public class ProjectController {
      *                     -> 1 - failed- Task not found. Please refresh Project table.
      *                     -> 2 - failed- Project can not be deleted. It is in <state> state.
      */
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/delete")
     public int deleteProject(@RequestParam("pid") String projectId){
         return projectService.deleteProject(projectId);
     }
@@ -73,8 +73,15 @@ public class ProjectController {
     @PostMapping(value = "/status")
     public int updateProjectStatus(@RequestParam("pid") String projectId,
                                    @RequestParam("status") String status,
-                                   @RequestParam(value = "role", required = false) String role){
+                                   @RequestParam(value = "role", required = false)  String role,
+                                   @RequestParam(value = "comment", required = false) String comment,
+                                   @RequestParam(value = "rating", required = false) String rating){
         return projectService.updateProjectStatus(projectId, status, role);
+    }
+
+    @PostMapping(value = "/showall")
+    public List<Project> getAll(){
+        return projectService.getAllProjects();
     }
 
 }
