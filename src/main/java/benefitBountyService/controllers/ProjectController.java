@@ -36,7 +36,6 @@ public class ProjectController {
             project = projectService.getProjectDetailsById(projectId);
             return project;
         } catch (Exception e) {
-//            System.out.println("catch (TaskNotFoundException e)");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct project Id", e);
         }
     }

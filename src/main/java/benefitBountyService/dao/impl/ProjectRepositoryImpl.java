@@ -2,12 +2,17 @@ package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.models.Project;
+import benefitBountyService.models.User;
 import benefitBountyService.utils.Constants;
 import benefitBountyService.utils.MongoDbUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,21 +23,24 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+
     @Override
     public List<Project> findAll(String userId, String role) {
-        List<Project> projects = null;
+        List<Project> projects = new ArrayList<>();
         Aggregation agg = null;
-
-        if(Constants.ROLES.ADMIN.name().equals(role)) {
+        if(Constants.ROLES.ADMIN.name().equalsIgnoreCase(role)) {
             agg = Aggregation.newAggregation(
-                    MongoDbUtils.getLookupOperation("users", "created_by", "_id", "admin"),
-                    Aggregation.unwind("$admin")
-                    );
+                    Aggregation.match(Criteria.where("created_by").is(userId)),
+                    MongoDbUtils.getLookupOperation("users", "created_by", "user_id", "admin"),
+                    Aggregation.unwind("admin")
+            );
             projects = mongoTemplate.aggregate(agg, collectionName, Project.class).getMappedResults();
-        } else if (Constants.ROLES.STAKEHOLDER.name().equals(role)) {
+        } else if (Constants.ROLES.STAKEHOLDER.name().equalsIgnoreCase(role)) {
+            Query stakeholderIdQuery = new Query().addCriteria(Criteria.where("user_id").is(userId));
+            String stakeholderUserId  = mongoTemplate.find(stakeholderIdQuery, User.class,"users").get(0).get_id();
             agg = Aggregation.newAggregation(
-                    Aggregation.unwind("stakeholder"),
-                    MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "stakeholder_info")
+                    Aggregation.match(Criteria.where("stakeholder").is(new ObjectId(stakeholderUserId))),
+                    MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "stakeholderList")
             );
             projects = mongoTemplate.aggregate(agg, collectionName, Project.class).getMappedResults();
 
