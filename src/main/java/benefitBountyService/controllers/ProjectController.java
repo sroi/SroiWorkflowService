@@ -1,11 +1,8 @@
 package benefitBountyService.controllers;
 
-import benefitBountyService.exceptions.ResourceNotFoundException;
+import benefitBountyService.models.Project;
 import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.services.ProjectService;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,32 +12,15 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-//@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/project")
 public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
-
-    /*
-    @RequestMapping("/ping")
-    public String getProjectControllerStatus(){
-        try {
-            MongoClient mongoClient = new MongoClient("localhost");
-            MongoDatabase database = mongoClient.getDatabase("sroi");
-            //database.listCollectionNames();
-            mongoClient.close();
-            return "Your application is up and running.";
-        } catch (MongoException | IllegalArgumentException ex) {
-            ex.printStackTrace();
-            return "Your application is down";
-        }
-    }
-     */
 	
 	@RequestMapping(value = "/all" , method=RequestMethod.GET)
-	public List<ProjectTO> getProjects(@RequestParam("user_id") String userId, @RequestParam("Role") String role) {
-        List<ProjectTO> projects = projectService.getProjects(userId, role);
+	public List<Project> getProjects(@RequestParam("user_id") String userId, @RequestParam("Role") String role) {
+        List<Project> projects = projectService.getProjects(userId, role);
         return projects;
     }
 
@@ -55,7 +35,7 @@ public class ProjectController {
         try {
             project = projectService.getProjectDetailsById(projectId);
             return project;
-        } catch (ResourceNotFoundException e) {
+        } catch (Exception e) {
 //            System.out.println("catch (TaskNotFoundException e)");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide correct project Id", e);
         }

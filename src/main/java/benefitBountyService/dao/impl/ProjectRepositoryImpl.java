@@ -2,43 +2,42 @@ package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.ProjectRepository;
 import benefitBountyService.models.Project;
-import benefitBountyService.models.User;
-import benefitBountyService.mongodb.MongoDbClient;
 import benefitBountyService.utils.Constants;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import benefitBountyService.utils.MongoDbUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import java.util.List;
+
 
 public class ProjectRepositoryImpl implements ProjectRepository {
 
-    MongoDbClient mongoDbClient = new MongoDbClient("sroi");
+    private final String collectionName = "projects";
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public List<Project> findAll(String userId, String role) {
-        MongoCollection<Project> projectCollection = mongoDbClient.getCollection("projects", Project.class);
-        if(role.equals(Constants.ROLES.ADMIN.name())) {
-            return projectCollection.aggregate(
-                    Arrays.asList(
-                            Aggregates.unwind("$admin"),
-                            Aggregates.match(Filters.eq("admin",userId)),
-                            Aggregates.lookup("users","admin","_id", "admin_details"),
-                            Aggregates.lookup("users","pointsOfContact", "_id", "pointOfContact_details")
-                    )).into(new ArrayList<Project>());
-        } else if (role.equals(Constants.ROLES.STAKEHOLDER.name())) {
-            return projectCollection.aggregate(
-                    Arrays.asList(
-                            Aggregates.unwind("$stakeholder"),
-                            Aggregates.match(Filters.eq("stakeholder",userId)),
-                            Aggregates.lookup("users","stakeholder","_id", "stakeholder_details"),
-                            Aggregates.lookup("users","pointsOfContact", "_id", "pointOfContact_details")
-                    )).into(new ArrayList<Project>());
-        } else {
-            return new ArrayList<Project>();
-        }
+        List<Project> projects = null;
+        Aggregation agg = null;
+
+        if(Constants.ROLES.ADMIN.name().equals(role)) {
+            agg = Aggregation.newAggregation(
+                    MongoDbUtils.getLookupOperation("users", "created_by", "_id", "admin"),
+                    Aggregation.unwind("$admin")
+                    );
+            projects = mongoTemplate.aggregate(agg, collectionName, Project.class).getMappedResults();
+        } else if (Constants.ROLES.STAKEHOLDER.name().equals(role)) {
+            agg = Aggregation.newAggregation(
+                    Aggregation.unwind("stakeholder"),
+                    MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "stakeholder_info")
+            );
+            projects = mongoTemplate.aggregate(agg, collectionName, Project.class).getMappedResults();
+
+        } //@TODO : Yet to add condition if ROLE is Volunteer or Approver
+
+        return projects;
     }
 
     @Override

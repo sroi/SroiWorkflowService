@@ -1,8 +1,6 @@
 package benefitBountyService.services;
 
 import benefitBountyService.dao.ProjectRepository;
-import benefitBountyService.exceptions.ResourceNotFoundException;
-import benefitBountyService.exceptions.SroiResourceNotFoundException;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
@@ -27,50 +25,23 @@ public class ProjectService {
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
     private UserService userService;
 
-    public List<ProjectTO> getProjects(String userId, String role){
-//        Todo : get projects depending upon roles
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    public List<Project> getProjects(String userId, String role){
         List<Project> projects = null;
-        List<ProjectTO> projectTOs = new ArrayList<>();
         List<User> users = null;
         logger.info("Retrieving projects...");
         try {
             projects = projectRepository.findAll(userId, role);
-            // @TODO - Jasraj - please use lookup to get user details as well apart from Project.
-            /*
-            Map<String, User> userMap = null;
-            if (!projects.isEmpty()){
-                users = userService.getUsers();
-                if (!users.isEmpty()) {
-                    userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
-                }
-
-                for (Project prj : projects) {
-
-                    logger.info("Retrieving data for Stakeholder of project");
-                    PTUserTO stHolder = getPTUserTOFromMap(prj.getStakeholder(),userMap);
-
-                    logger.info("Retrieving data for POC of project");
-                    PTUserTO pocTo = getPTUserTOFromMap(prj.getPointOfContacts(),userMap);
-
-                    ProjectTO projectTO = new ProjectTO(prj.getProjectId(), prj.getName(), prj.getAreaOfEngagement(), prj.getSummary(), prj.getStartDate(), prj.getEndDate(),
-                            prj.getBudget(), prj.getCorporate(), prj.getLocation(), stHolder, pocTo, prj.getStatus(), prj.getRating(), prj.getUpdatedBy(), prj.getUpdatedOn(), prj.getCreatedBy(), prj.getCreatedOn());
-                    projectTOs.add(projectTO);
-                }
-            } else {
-                logger.info("collection 'projects' is empty. Please load some data through 'Create Project' page");
-            }
-*/
         } catch (MongoException ex) {
             logger.error("Failure while loading projects in Mongo. {}");
         }
-        logger.info("Below are projects details... \n" + projectTOs);
+        logger.info("Below are projects details... \n" + projects);
 
-        return projectTOs;
+        return projects;
     }
 
     public boolean checkProjectById(String projectId){
@@ -83,19 +54,19 @@ public class ProjectService {
         return found;
     }
 
-    public Project getProjectById(String projectId) throws ResourceNotFoundException {
+    public Project getProjectById(String projectId) throws Exception {
 //        Project project = null;
         Project project = projectRepository.findById(projectId);
         if (project != null){
             logger.info("Below are Project details: "+ project);
         } else {
             logger.warn("Project with id '" + projectId + "' is not present.");
-            throw new ResourceNotFoundException();
+            throw new Exception();
         }
         return project;
     }
 
-    public ProjectTO getProjectDetailsById(String projectId) throws ResourceNotFoundException {
+    public ProjectTO getProjectDetailsById(String projectId) throws Exception  {
         ProjectTO projectTO = null;
         PTUserTO stHolder = null;
         PTUserTO poc = null;
@@ -141,7 +112,7 @@ public class ProjectService {
         } else {
             String errMsg = "Project with id '"+ projectId + "' is not found.";
             //logger.info(errMsg);
-            throw new SroiResourceNotFoundException(errMsg);
+            //throw new SroiResourceNotFoundException(errMsg);
             //return 1; // failed- Project not found. Please refresh Project table.
         }
         //return 2; failed- Project can not be deleted. It is in <state> state.
@@ -251,7 +222,7 @@ public class ProjectService {
             project.setStatus(status);
             projectRepository.save(project);
             updated = 0;
-        } catch (ResourceNotFoundException e) {
+        } catch (Exception e) {
             String errMsg = "Project with id '" + projectId+"' not found.";
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errMsg, e);
         }

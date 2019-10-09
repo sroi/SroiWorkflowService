@@ -1,8 +1,6 @@
 package benefitBountyService.services;
 
 import benefitBountyService.dao.TaskRepository;
-import benefitBountyService.exceptions.ResourceNotFoundException;
-import benefitBountyService.exceptions.TaskNotFoundException;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.PTUserTO;
@@ -35,24 +33,39 @@ public class TaskService {
     @Autowired
     private UserService userService;
 
-    public boolean checkTaskById(String taskId){
-        boolean found = false;
-        Task task = taskRepository.findById(taskId);
-        if (task != null){
-            logger.info("Task found. Below are Task details: "+ task);
-            found = true;
+    public List<Task> getTasksDetailsByProject(String projectId) {
+        List<Task> tasks;
+        if (ObjectId.isValid(projectId)) {
+            tasks = taskRepository.findByProjectId(projectId);;
+        } else {
+            String errMsg = "Project ID '" + projectId + "' is not valid input.";
+            logger.error(errMsg);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
         }
-        return found;
+        return tasks;
     }
 
-    public Task getTaskDetailsById(String taskId) throws ResourceNotFoundException {
+    public List<Task> getTasksDetailsByLogin(String userId, String role) {
+        List<Task> tasks = null;
+        if (ObjectId.isValid(userId)) {
+            tasks = taskRepository.getTasksAfterLogin(userId, role);
+            logger.info("Total tasks found : " + tasks.size());
+        } else {
+            String errMsg = "User ID '" + userId + "' is not valid input.";
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
+        }
+        return tasks;
+    }
+
+    public Task getTaskDetailsById(String taskId) throws Exception {
         if (ObjectId.isValid(taskId)) {
             Task task = taskRepository.fetchByTaskId(taskId);
             if (task != null) {
                 logger.info("Task found. Below are Task details: " + task);
             } else {
                 logger.warn("Task with id '" + taskId + "' is not present.");
-                throw new TaskNotFoundException("Task not present...");
+                throw new Exception("Task not present...");
             }
             return task;
         } else {
@@ -62,76 +75,31 @@ public class TaskService {
         }
     }
 
-    public List<Task> getTasksDetailsByName(String name) throws ResourceNotFoundException{
-        List<Task> tasks = taskRepository.findByName(name);
-        if(tasks.isEmpty()) {
-            logger.info("Task with name '" + name + "' doesn't exist.");
-            throw new ResourceNotFoundException();
-        }
-        return tasks;
-    }
-
-    public List<Task> getTasksDetailsByProject(String projectId) throws ResourceNotFoundException{
-        List<Task> tasks = null;
-        if (ObjectId.isValid(projectId)) {
-            tasks = taskRepository.findByProjectId(projectId);;
+    public int saveOrUpdate(Task taskTO) {
+        int returnVal = 1;
+        logger.info("Following task details have been received from User: "+ taskTO);
+        // Todo: Logic for which fields to allow to be updated
+        // Todo : No check for ProjectId.
+        Task task = null;
+        if (!StringUtils.isEmpty(taskTO.getTaskId())) {
+            task = updateTaskFromTaskTO(taskTO);
+            logger.info("Updating existing task.");
         } else {
-            String errMsg = "Project ID '" + projectId + "' is not valid input.";
-            logger.info(errMsg);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
+            task = saveTaskFromTaskTO(taskTO);
+            logger.info("New Task will be created.");
         }
-        return tasks;
-    }
-
-    private List<PTUserTO> getVolunteersTOForTask(Task task) {
-        List<PTUserTO> volunteers = null;
-        if (task.getVolunteers() != null && task.getVolunteers().isEmpty()) {
-            volunteers = task.getVolunteers().stream().map(volId -> getUserTOForTask(volId.toString())).collect(Collectors.toList());
-//            PTUserTO vol = getUserTOForTask()
-        } else {
-            logger.info("This task "+ task.getTaskId() +" doesn't have volunteers");
-        }
-        return volunteers;
-    }
-
-    private PTUserTO getUserTOForTask(String userTOId){
-        PTUserTO aprTO = null;
-        User apr = userService.getUserById(userTOId);
-        if (apr != null) {
-            aprTO = new PTUserTO(apr.get_id(), apr.getName(), apr.getEmail(), apr.getPhoneNo());
-        }
-        return aprTO;
-    }
-
-    private PTUserTO getApproverTOForTask(Task task) {
-        PTUserTO aprTO = null;
-        if (task.getApprover() != null) {
-            aprTO = getUserTOForTask(task.getApprover().toString());
-        } else {
-            logger.info("This task "+ task.getTaskId() +" doesn't have approver");
-        }
-        return aprTO;
-    }
-
-    private List<Task> getTasks(String projId) throws ResourceNotFoundException {
-        List<Task> tasks = taskRepository.findByProjectId(projId);
-        if (tasks != null && tasks.isEmpty()) {
-            logger.info("Provided project doesn't have tasks created.");
-            throw new TaskNotFoundException("Tasks Not found...");
-        } else {
-            logger.info("Provided project consists of following tasks:\n" + tasks);
-        }
-        return tasks;
+        Task savedTask = taskRepository.save(task);
+        logger.info("Following task has been saved successfully: \n"+savedTask);
+        if (savedTask != null)
+            returnVal = 0;
+        return returnVal;
     }
 
     public int deleteTask(String taskId) {
         int deleteStatus = -1;
         if (ObjectId.isValid(taskId)) {
             Task task = taskRepository.findById(taskId);
-//        Todo: create TaskNotFoundException
 //        Todo: logic to check if task is in valid state to delete and set foundTask flag as per that
-//        projectRepository.deleteById(projectId);
-//        foundProject = getProjectById(projectId);
 
             if(task != null){
                 if (task.getStatus().equalsIgnoreCase(Constants.STATUS.CREATED.toString())) {
@@ -163,26 +131,7 @@ public class TaskService {
         return deleteStatus;
     }
 
-    public int saveOrUpdate(Task taskTO) {
-        int returnVal = 1;
-        logger.info("Following task details have been received from User: "+ taskTO);
-        // Todo : To remove checkTaskById(project.getProjectId() from below
-        // Todo: Logic for which fields to allow to be updated
-        // Todo : No check for ProjectId.
-        Task task = null;
-        if (!StringUtils.isEmpty(taskTO.getTaskId())) {
-            task = updateTaskFromTaskTO(taskTO);
-            logger.info("Updating existing task.");
-        } else {
-            task = saveTaskFromTaskTO(taskTO);
-            logger.info("New Task will be created.");
-        }
-        Task savedTask = taskRepository.save(task);
-        logger.info("Following task has been saved successfully: \n"+savedTask);
-        if (savedTask != null)
-            returnVal = 0;
-        return returnVal;
-    }
+
 
     @Transactional
     private Task saveTaskFromTaskTO(Task taskTO) {
@@ -317,19 +266,6 @@ public class TaskService {
     private List<String> saveVolunteers(List<User> vols) {
         List<User> newVols = userService.saveVolunteers(vols);
         return newVols.parallelStream().map(User::get_id).collect(Collectors.toList());
-    }
-
-    public List<Task> getTasksDetailsByLogin(String userId, String role) {
-        List<Task> tasks = null;
-        if (ObjectId.isValid(userId)) {
-            tasks = taskRepository.getTasksAfterLogin(userId, role);
-            logger.info("Total tasks found : " + tasks.size());
-        } else {
-            String errMsg = "User ID '" + userId + "' is not valid input.";
-            logger.info(errMsg);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errMsg);
-        }
-        return tasks;
     }
 
     public int changeTaskStatus(String taskId, String role, String status, String comments, String timeSpent) {

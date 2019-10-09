@@ -1,12 +1,14 @@
 package benefitBountyService.models;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "projects")
 public class Project {
@@ -36,7 +38,15 @@ public class Project {
 	private Date updatedOn;
 	@Field("updated_by")
 	private String updatedBy;
-	//private IAdmin admin;
+
+	@BsonIgnore
+	private User admin;
+
+	@BsonIgnore
+	private List<User> stakeholderList;
+
+	@BsonIgnore
+	private List<User> pointOfContactUserList;
 
 
 	public Project(ObjectId projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String associatedCorporateEntity,
@@ -195,6 +205,18 @@ public class Project {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	public List<User> getStakeholderList() { return stakeholderList; }
+
+	public void setStakeholderList(List<User> stakeholderList) { this.stakeholderList = stakeholderList; }
+
+	public List<User> getPointOfContactUserList() { return pointOfContactUserList; }
+
+	public void setPointOfContactUserList(List<User> pointOfContactUserList) { this.pointOfContactUserList = pointOfContactUserList; }
+
+	public void setAdmin(User admin) { this.admin = admin; }
+
+	public User getAdmin() { return admin; }
 
 	@Override
 	public String toString() {
