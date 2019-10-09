@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -227,107 +229,22 @@ public class ProjectService {
         return prjTO;
     }
 
-    public int updateProjectStatus(String projectId, String status, String role) {
+    public int updateProjectStatus(String projectId, String status, String role, String comment, String rating) {
         int updated = -1;
+
+        //Todo : Dummy user to be removed after session - management
+        User loggedInUser = new User();// Todo : to be get from session.
+        loggedInUser.setEmail("sawannai@gmail.com");
+        loggedInUser.setUserId("sawannai@gmail.com");
+        loggedInUser.setName("sawan nai");
+        loggedInUser.set_id(new ObjectId("5d9984b61c9d440000d024be"));
 
         try {
             if (ObjectId.isValid(projectId)) {
                 if (role.equalsIgnoreCase(Constants.ROLES.STAKEHOLDER.toString())) {
-                    if (status.equalsIgnoreCase(Constants.STATUS.APPROVED.toString())) {
-                        Project project = getProjectById(projectId);
-                        if (project != null) {
-                            if (project.getStatus().equalsIgnoreCase(status)) {
-                                String errMsg = "Project Id '" + projectId + "' is already in '"+ status + "' status.";
-                                logger.info(errMsg);
-                                throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                            }
-                            logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
-                            List<Task> tasks = taskRepository.findByProjectId(projectId);
-                            if (tasks!= null && !tasks.isEmpty()) {
-                                long unapprovedTaskCount = tasks.stream().filter(t -> !t.getStatus().equalsIgnoreCase(Constants.STATUS.APPROVED.toString())).count();
-                                if (unapprovedTaskCount == 0) {
-                                    project.setStatus(status);
-                                    projectRepository.save(project);
-                                    updated = 0;
-                                } else {
-                                    String errMsg = "Changing task status from '"+ project.getStatus() + "' to status '" + status+ "' is not allowed. Unapproved no. of Tasks: "+unapprovedTaskCount;
-                                    logger.info(errMsg);
-                                    throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                                }
-                            } else {
-                                String errMsg = "Project Id '" + projectId + "' doesn't have tasks created in it. So can't change status.";
-                                logger.info(errMsg);
-                                throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                            }
-
-                        } else {
-                            throwProjectNotFound(projectId);
-                        }
-                    } else if (status.equalsIgnoreCase(Constants.STATUS.REJECTED.toString())) {
-                        Project project = getProjectById(projectId);
-                        if (project != null) {
-                            if (project.getStatus().equalsIgnoreCase(status)) {
-                                String errMsg = "Project Id '" + projectId + "' is already in '" + status + "' status.";
-                                logger.info(errMsg);
-                                throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                            }
-                            logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
-                            project.setStatus(status);
-                            projectRepository.save(project);
-                            updated = 0;
-                        } else {
-                            throwProjectNotFound(projectId);
-                        }
-
-                    } else {
-                        String errMsg = "Stakeholder is not allowed to change status to " + status;
-                        logger.info(errMsg);
-                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
-                    }
-
+                    updateStatusForStakeholder(loggedInUser, projectId, status, role, comment, rating);
                 } else if (role.equalsIgnoreCase(Constants.ROLES.ADMIN.toString())) {
-                    if (status.equalsIgnoreCase(Constants.STATUS.CLOSED.toString())) {
-                        Project project = getProjectById(projectId);
-                        if (project == null) {
-                            throwProjectNotFound(projectId);
-                        }
-                        if (status.equalsIgnoreCase(project.getStatus())) {
-                            throwProjectSameStatusError(projectId, status);
-                        }
-                        if (project.getStatus().equalsIgnoreCase(Constants.STATUS.APPROVED.toString())
-                                || project.getStatus().equalsIgnoreCase(Constants.STATUS.ON_HOLD.toString())) {
-                            logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
-                            project.setStatus(status);
-                            projectRepository.save(project);
-                            updated = 0;
-                        } else {
-                            String errMsg = "Project with id '" + projectId + "' is in invalid state to close.";
-                            logger.info(errMsg);
-                            throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                        }
-                    } else if (status.equalsIgnoreCase(Constants.STATUS.ON_HOLD.toString())) {
-                        Project project = getProjectById(projectId);
-                        if (project == null) {
-                            throwProjectNotFound(projectId);
-                        }
-                        if (status.equalsIgnoreCase(project.getStatus())) {
-                            throwProjectSameStatusError(projectId, status);
-                        }
-                        if (!project.getStatus().equalsIgnoreCase(Constants.STATUS.CLOSED.toString())) {
-                            logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
-                            project.setStatus(status);
-                            projectRepository.save(project);
-                            updated = 0;
-                        } else {
-                            String errMsg = "Project with id '" + projectId + "' is in invalid state to put on hold. Current status: "+ project.getStatus();
-                            logger.info(errMsg);
-                            throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
-                        }
-                    } else {
-                        String errMsg = "Admin can't change status to " + status;
-                        logger.info(errMsg);
-                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
-                    }
+                    updateStatusForAdmin(loggedInUser, projectId, status, role, comment, rating);
                 } else {
                     String errMsg = role + " is not allowed to change status at Project level.";
                     logger.warn(errMsg);
@@ -340,6 +257,113 @@ public class ProjectService {
             throwProjectNotFound(projectId);
         }
         return updated;
+    }
+
+    private int updateStatusForAdmin(User loggedInUser, String projectId, String status, String role, String comment, String rating) {
+        int updated = -1;
+        if (status.equalsIgnoreCase(Constants.STATUS.CLOSED.toString())) {
+            Project project = getProjectById(projectId);
+            if (project == null) {
+                throwProjectNotFound(projectId);
+            }
+            if (status.equalsIgnoreCase(project.getStatus())) {
+                throwProjectSameStatusError(projectId, status);
+            }
+            if (project.getStatus().equalsIgnoreCase(Constants.STATUS.APPROVED.toString())
+                    || project.getStatus().equalsIgnoreCase(Constants.STATUS.ON_HOLD.toString())) {
+                logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
+                project.setStatus(status);
+                updated = projectRepository.changeTaskStatus(loggedInUser, project, role, comment);
+            } else {
+                String errMsg = "Project with id '" + projectId + "' is in invalid state to close.";
+                logger.info(errMsg);
+                throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+            }
+        } else if (status.equalsIgnoreCase(Constants.STATUS.ON_HOLD.toString())) {
+            Project project = getProjectById(projectId);
+            if (project == null) {
+                throwProjectNotFound(projectId);
+            }
+            if (status.equalsIgnoreCase(project.getStatus())) {
+                throwProjectSameStatusError(projectId, status);
+            }
+            if (!project.getStatus().equalsIgnoreCase(Constants.STATUS.CLOSED.toString())) {
+                logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
+                project.setStatus(status);
+                updated = projectRepository.changeTaskStatus(loggedInUser, project, comment, rating);
+            } else {
+                String errMsg = "Project with id '" + projectId + "' is in invalid state to put on hold. Current status: "+ project.getStatus();
+                logger.info(errMsg);
+                throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+            }
+        } else {
+            String errMsg = "Admin can't change status to " + status;
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
+        }
+        return updated;
+    }
+
+    private int updateStatusForStakeholder(User loggedInUser, String projectId, String status, String role, String comment, String rating) {
+        int updated = -1;
+        if (status.equalsIgnoreCase(Constants.STATUS.APPROVED.toString())) {
+            Project project = getProjectById(projectId);
+            if (project != null) {
+                if (project.getStatus().equalsIgnoreCase(status)) {
+                    String errMsg = "Project Id '" + projectId + "' is already in '"+ status + "' status.";
+                    logger.info(errMsg);
+                    throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+                }
+                logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
+                List<Task> tasks = taskRepository.findByProjectId(projectId);
+                if (tasks!= null && !tasks.isEmpty()) {
+                    long unapprovedTaskCount = tasks.stream().filter(t -> !t.getStatus().equalsIgnoreCase(Constants.STATUS.APPROVED.toString())).count();
+                    if (unapprovedTaskCount == 0) {
+                        project.setStatus(status);
+                        project.setRating(Double.parseDouble(rating));
+                        updated = projectRepository.changeTaskStatus(loggedInUser, project, role, comment);
+                    } else {
+                        String errMsg = "Changing task status from '"+ project.getStatus() + "' to status '" + status+ "' is not allowed. Unapproved no. of Tasks: "+unapprovedTaskCount;
+                        logger.info(errMsg);
+                        throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+                    }
+                } else {
+                    String errMsg = "Project Id '" + projectId + "' doesn't have tasks created in it. So can't change status.";
+                    logger.info(errMsg);
+                    throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+                }
+
+            } else {
+                throwProjectNotFound(projectId);
+            }
+        } else if (status.equalsIgnoreCase(Constants.STATUS.REJECTED.toString())) {
+            Project project = getProjectById(projectId);
+            if (project != null) {
+                if (project.getStatus().equalsIgnoreCase(status)) {
+                    String errMsg = "Project Id '" + projectId + "' is already in '" + status + "' status.";
+                    logger.info(errMsg);
+                    throw new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, errMsg);
+                }
+                logger.info("Updating status of project with id '"+ projectId + "' from " + project.getStatus() + " to " + status);
+                project.setStatus(status);
+                project.setRating(0.0); // Resetting rating to 0.0 as it is being rejected.
+                updated = projectRepository.changeTaskStatus(loggedInUser, project, role, comment);
+//                projectRepository.save(project);
+                updated = 0;
+            } else {
+                throwProjectNotFound(projectId);
+            }
+
+        } else {
+            String errMsg = "Stakeholder is not allowed to change status to " + status;
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, errMsg);
+        }
+        return updated;
+    }
+
+    private void saveProjectActivity(Project savedPrj) {
+
     }
 
     private void throwProjectSameStatusError(String projectId, String status) {

@@ -268,7 +268,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     private int changeTaskStatusForApprover(User loggedInUser, Task task, String status, String comments) {
         int changeStatus = -1;
 
-        logger.info("Updating or creating Activity entry for Approver");
+        logger.info("Updating status at task level for Approver");
         Task upTask = updateTaskStatus(loggedInUser, task, status);
 
         //Updating or creating Activity entry for Approver

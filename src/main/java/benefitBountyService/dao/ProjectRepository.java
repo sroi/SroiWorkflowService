@@ -1,6 +1,7 @@
 package benefitBountyService.dao;
 
 import benefitBountyService.models.Project;
+import benefitBountyService.models.User;
 
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface ProjectRepository {
     Project save(Project prj);
 
     List<Project> getAllProjects();
+
+    int changeTaskStatus(User user, Project project, String role, String comment);
+
 }

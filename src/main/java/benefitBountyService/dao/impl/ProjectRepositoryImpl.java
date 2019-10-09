@@ -1,11 +1,15 @@
 package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.ProjectRepository;
+import benefitBountyService.models.Activity;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.User;
+import benefitBountyService.services.ProjectService;
 import benefitBountyService.utils.Constants;
 import benefitBountyService.utils.MongoDbUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -13,12 +17,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public class ProjectRepositoryImpl implements ProjectRepository {
 
     private final String collectionName = "projects";
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -63,11 +70,103 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public Project save(Project prj) {
-        return mongoTemplate.save(prj, collectionName);
+        Project savedPrj = mongoTemplate.save(prj, collectionName);
+        if (savedPrj != null) {
+            logger.info("Project saved successfully. Project Details: " + savedPrj);
+        } else {
+
+        }
+        return savedPrj;
     }
 
     @Override
     public List<Project> getAllProjects() {
-        return mongoTemplate.findAll(Project.class, collectionName);
+        List<Project> projects = mongoTemplate.findAll(Project.class, collectionName);
+        if (projects.isEmpty()) {
+            logger.info("Projects found. Count is " +projects.size());
+        }
+        return projects;
+    }
+
+    @Override
+    public int changeTaskStatus(User loggedInUser, Project project, String role, String comment) {
+        int updated = -1;
+        Project savedPrj = null;
+        if (role.equalsIgnoreCase(Constants.ROLES.STAKEHOLDER.toString())) {
+            updated = changeStatusForStakeholder(loggedInUser, project, comment);
+        } else {
+            updated = changeStatusForAdmin(loggedInUser, project, comment);
+        }
+
+//        saveProjectActivity(savedPrj);
+        return updated;
+    }
+
+    private int changeStatusForAdmin(User loggedInUser, Project project, String comment) {
+        int updated = -1;
+        logger.info("Updating or creating Project entry for Admin");
+        Project savedPrj = save(project);
+
+        //Updating or creating Activity entry for Approver
+        logger.info("Updating or creating Activity entry for Admin");
+        Query actQuery = new Query();
+        actQuery.addCriteria(Criteria.where("projectId").is(new ObjectId(project.getProjectId()))
+                .andOperator(Criteria.where("role").is(Constants.ROLES.ADMIN.toString())
+                        .andOperator(Criteria.where("userId").is(new ObjectId(loggedInUser.get_id())))));
+
+        Activity activity = mongoTemplate.findOne(actQuery, Activity.class);
+        String activityStr = "Project has been " + project.getStatus().toLowerCase() + " by Admin";
+        if (activity != null) {
+            activity.setComments(comment);
+            activity.setUpdatedBy(loggedInUser.getUserId());
+            activity.setUpdatedOn(new Date());
+            activity.setActivity(activityStr);
+        } else {
+
+            activity = new Activity(ObjectId.get(), new ObjectId(project.getProjectId()), null, new ObjectId(loggedInUser.get_id()), loggedInUser.getName(), Constants.ROLES.ADMIN.toString(),
+                    activityStr, comment, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
+        }
+
+        Activity act = mongoTemplate.save(activity);
+
+        if (savedPrj != null && act != null) {
+            updated = 0;
+        }
+        return updated;
+    }
+
+    private int changeStatusForStakeholder(User loggedInUser, Project project, String comment) {
+        int updated = -1;
+
+        logger.info("Updating or creating Project entry for Stakeholder");
+        Project savedPrj = save(project);
+//        Task upTask = updateTaskStatus(loggedInUser, task, status);
+
+        //Updating or creating Activity entry for Approver
+        logger.info("Updating or creating Activity entry for Stakeholder");
+        Query actQuery = new Query();
+        actQuery.addCriteria(Criteria.where("projectId").is(new ObjectId(project.getProjectId()))
+                .andOperator(Criteria.where("role").is(Constants.ROLES.STAKEHOLDER.toString())
+                        .andOperator(Criteria.where("userId").is(new ObjectId(loggedInUser.get_id())))));
+
+        Activity activity = mongoTemplate.findOne(actQuery, Activity.class);
+        String activityStr = "Task has been " + project.getStatus().toLowerCase() + " by Stakeholder";
+        if (activity != null) {
+            activity.setComments(comment);
+            activity.setUpdatedBy(loggedInUser.getUserId());
+            activity.setUpdatedOn(new Date());
+            activity.setActivity(activityStr);
+        } else {
+
+            activity = new Activity(ObjectId.get(), new ObjectId(project.getProjectId()), null, new ObjectId(loggedInUser.get_id()), loggedInUser.getName(), Constants.ROLES.STAKEHOLDER.toString(),
+                    activityStr, comment, loggedInUser.getUserId(), new Date(), loggedInUser.getUserId(), new Date());
+        }
+
+        Activity act = mongoTemplate.save(activity);
+
+        if (savedPrj != null && act != null) {
+            updated = 0;
+        }
+        return updated;
     }
 }

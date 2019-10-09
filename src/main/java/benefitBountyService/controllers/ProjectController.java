@@ -76,7 +76,7 @@ public class ProjectController {
                                    @RequestParam(value = "role", required = false)  String role,
                                    @RequestParam(value = "comment", required = false) String comment,
                                    @RequestParam(value = "rating", required = false) String rating){
-        return projectService.updateProjectStatus(projectId, status, role);
+        return projectService.updateProjectStatus(projectId, status, role, comment, rating);
     }
 
     @PostMapping(value = "/showall")
