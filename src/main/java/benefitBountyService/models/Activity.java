@@ -47,7 +47,7 @@ public class Activity {
         this.updatedOn = updatedOn;
     }
 
-    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String userName, String role, String comments, String createdBy, Date createdOn,
+    public Activity(ObjectId _id, ObjectId projectId, ObjectId taskId, ObjectId userId, String userName, String role, String activity, String comments, String createdBy, Date createdOn,
                     String updatedBy, Date updatedOn) {
         this._id = _id;
         this.projectId = projectId;
@@ -55,6 +55,7 @@ public class Activity {
         this.userId = userId;
         this.userName = userName;
         this.role = role;
+        this.activity = activity;
         this.comments = comments;
         this.createdBy = createdBy;
         this.createdOn = createdOn;
