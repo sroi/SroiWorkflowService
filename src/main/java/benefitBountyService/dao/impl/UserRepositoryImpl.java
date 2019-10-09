@@ -13,7 +13,7 @@ import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
-    MongoDbClient mongoDbClient = new MongoDbClient("sroi");
+    MongoDbClient mongoDbClient = new MongoDbClient("sroi_test");
 
     @Autowired
     private MongoTemplate mongoTemplate;

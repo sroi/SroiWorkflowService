@@ -15,16 +15,38 @@ public class File {
 	private ObjectId fileId;
 	@Field("task_id")
 	private String taskId;
+	@Field("content_type")
+	private String contentType;
+	@Field("file_name")
+	private String fileName;
 	@Field("created_on")
 	private Date createdOn;
 	@Field("created_by")
 	private String createdBy;
 
-	public File(ObjectId fileId, String taskId, Date createdOn, String createdBy) {
+	public File(ObjectId fileId, String taskId, String contentType, String fileName, Date createdOn, String createdBy) {
 		this.fileId = fileId;
 		this.taskId = taskId;
+		this.contentType = contentType;
+		this.fileName = fileName;
 		this.createdOn = createdOn;
 		this.createdBy = createdBy;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
 	public String getFileId() {

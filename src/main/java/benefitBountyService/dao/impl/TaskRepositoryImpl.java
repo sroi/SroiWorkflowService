@@ -30,7 +30,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskRepositoryImpl.class);
 
-    MongoDbClient mongoDbClient = new MongoDbClient("sroi");
+    MongoDbClient mongoDbClient = new MongoDbClient("sroi_test");
 
     @Autowired
     private MongoTemplate mongoTemplate;

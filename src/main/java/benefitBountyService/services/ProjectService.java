@@ -100,6 +100,7 @@ public class ProjectService {
     }
 
     public int deleteProject(String projectId) {
+        int status = -1;
         boolean foundProject = checkProjectById(projectId);
 //        Todo: create ProjectNotFoundException
 //        Todo: logic to check if project is in valid state to delete and set foundProject flag as per that
@@ -108,14 +109,16 @@ public class ProjectService {
         if(foundProject){
             logger.info("Deleting project with id '" + projectId + "'.");
             projectRepository.deleteById(projectId);
-            return 0; // successful deletion
+            //return 0; // successful deletion
+            status = 0;
         } else {
             String errMsg = "Project with id '"+ projectId + "' is not found.";
             //logger.info(errMsg);
             //throw new SroiResourceNotFoundException(errMsg);
-            //return 1; // failed- Project not found. Please refresh Project table.
+            status = 1; // failed- Project not found. Please refresh Project table.
         }
         //return 2; failed- Project can not be deleted. It is in <state> state.
+        return status;
     }
 
     public int saveOrUpdate(ProjectTO prjTO) {
