@@ -165,7 +165,7 @@ public class ProjectService {
             String pocId = prjTO.getPointOfContact() != null ? prjTO.getPointOfContact().getId() : Constants.EMPTY;
             logger.info("Updating existing project...");
             prj = new Project(new ObjectId(prjTO.getProjectId()), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
-                    prjTO.getLocation(), stHldId, pocId, prjTO.getStatus(), prjTO.getRating(), loggedInUser, new Date(), project.getCreatedBy(), project.getCreatedOn());
+                    prjTO.getLocation(), new ObjectId(stHldId), new ObjectId(pocId), prjTO.getStatus(), prjTO.getRating(), loggedInUser, new Date(), project.getCreatedBy(), project.getCreatedOn());
 
         } else {
             prjTO = saveOrUpdateProjectUsers(prjTO);
@@ -174,7 +174,7 @@ public class ProjectService {
             String stHldId = (prjTO.getStakeholder() != null) ? prjTO.getStakeholder().getId() : Constants.EMPTY;
             String pocId = prjTO.getPointOfContact() != null ? prjTO.getPointOfContact().getId() : Constants.EMPTY;
             prj = new Project(ObjectId.get(), prjTO.getName(), prjTO.getAreaOfEngagement(), prjTO.getSummary(), prjTO.getStartDate(), prjTO.getEndDate(), prjTO.getBudget(), prjTO.getCorporate(),
-                    prjTO.getLocation(), stHldId, pocId, Constants.CR_STATUS, rating, loggedInUser, new Date(), loggedInUser, new Date());
+                    prjTO.getLocation(), new ObjectId(stHldId), new ObjectId(pocId), Constants.CR_STATUS, rating, loggedInUser, new Date(), loggedInUser, new Date());
             //prj.setProjectId(ObjectId.get());
         }
         Project savedProj = projectRepository.save(prj);

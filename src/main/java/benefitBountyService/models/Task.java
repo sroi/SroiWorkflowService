@@ -3,6 +3,7 @@ package benefitBountyService.models;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -27,7 +28,7 @@ public class Task {
     private ObjectId projectId;
 
     @Field("label")
-    @JsonSetter("label")
+    @JsonSetter("activityLabel")
 //    @BsonProperty("label")
     private String activityLabel;
 

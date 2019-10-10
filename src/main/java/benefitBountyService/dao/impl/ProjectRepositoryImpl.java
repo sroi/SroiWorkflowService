@@ -47,7 +47,9 @@ public class ProjectRepositoryImpl implements ProjectRepository {
             String stakeholderUserId  = mongoTemplate.find(stakeholderIdQuery, User.class,"users").get(0).get_id();
             agg = Aggregation.newAggregation(
                     Aggregation.match(Criteria.where("stakeholder").is(new ObjectId(stakeholderUserId))),
-                    MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "stakeholderList")
+                    MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "stakeholderList"),
+                    MongoDbUtils.getLookupOperation("users", "pointOfContacts", "_id", "pointOfContact"),
+                    Aggregation.unwind("$pointOfContact")
             );
             projects = mongoTemplate.aggregate(agg, collectionName, Project.class).getMappedResults();
 

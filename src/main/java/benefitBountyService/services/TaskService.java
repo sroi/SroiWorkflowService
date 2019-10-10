@@ -176,7 +176,7 @@ public class TaskService {
         Task existingTask = taskRepository.findById(taskTO.getTaskId());
         if (existingTask != null) {
             Map<String, User> userMap = null;
-            if (taskTO.getApprover() != null || taskTO.getVols_info().size() > 0) {
+            if (taskTO.getApprover() != null || (taskTO.getVols_info().size() > 0 && taskTO.getVols_info().get(0) != null)) {
                 List<User> users = userService.getUsers();
                 if (!users.isEmpty()) {
                     userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
@@ -237,7 +237,7 @@ public class TaskService {
     private List<String> checkAndSaveVolunteers(Task taskTO, Map<String, User> userMap) {
         List<String> volunteers = new ArrayList<>();
 
-        if(!(taskTO.getVolunteers().size() > 0)) {
+        if(taskTO.getVolunteers().size() > 0) {
             List<User> volunteersWithId = null, volunteersWOId = null;
             List<User> validNewVols = null;
             List<String> existingVols = null, newVolsId = null;

@@ -26,8 +26,8 @@ public class Project {
 	@JsonSetter("corporate")
 	private String associatedCorporateEntity;
 	private String location;
-	private String stakeholder;
-	private String pointOfContacts;
+	private ObjectId stakeholder;
+	private ObjectId pointOfContacts;
 	private String status;
 	private Double rating;
 	@Field("created_on")
@@ -46,11 +46,11 @@ public class Project {
 	private List<User> stakeholderList;
 
 	@BsonIgnore
-	private List<User> pointOfContactUserList;
+	private User pointOfContact;
 
 
 	public Project(ObjectId projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String associatedCorporateEntity,
-				   String location, String stakeholder, String pointOfContacts, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
+				   String location, ObjectId stakeholder, ObjectId pointOfContacts, String status, Double rating, String updatedBy, Date updatedOn, String createdBy, Date createdOn) {
 		this.projectId = projectId;
 		this.name = name;
 		this.areaOfEngagement = areaOfEngagement;
@@ -143,19 +143,19 @@ public class Project {
 	}
 
 	public String getStakeholder() {
-		return stakeholder;
+		return stakeholder!= null ? stakeholder.toString() : null;
 	}
 
-	public void setStakeholder(String stakeholder) {
+	public void setStakeholder(ObjectId stakeholder) {
 		this.stakeholder = stakeholder;
 	}
 
 	public String getPointOfContacts() {
-		return pointOfContacts;
+		return pointOfContacts != null ? pointOfContacts.toString() : null;
 	}
 
-	public void setPointOfContacts(String pointOfContact) {
-		this.pointOfContacts = pointOfContact;
+	public void setPointOfContacts(ObjectId pointOfContacts) {
+		this.pointOfContacts = pointOfContacts;
 	}
 
 	public String getStatus() {
@@ -210,9 +210,13 @@ public class Project {
 
 	public void setStakeholderList(List<User> stakeholderList) { this.stakeholderList = stakeholderList; }
 
-	public List<User> getPointOfContactUserList() { return pointOfContactUserList; }
+	public User getPointOfContact() {
+		return pointOfContact;
+	}
 
-	public void setPointOfContactUserList(List<User> pointOfContactUserList) { this.pointOfContactUserList = pointOfContactUserList; }
+	public void setPointOfContact(User pointOfContact) {
+		this.pointOfContact = pointOfContact;
+	}
 
 	public void setAdmin(User admin) { this.admin = admin; }
 

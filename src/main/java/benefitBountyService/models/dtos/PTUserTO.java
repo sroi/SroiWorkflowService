@@ -1,8 +1,10 @@
 package benefitBountyService.models.dtos;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 public class PTUserTO {
 
-    private String id;
+    private String _id;
     private String name;
     private String email;
     private String phoneNo;
@@ -12,18 +14,19 @@ public class PTUserTO {
     }
 
     public PTUserTO(String id, String name, String email, String phoneNo) {
-        this.id = id;
+        this._id = id;
         this.name = name;
         this.email = email;
         this.phoneNo = phoneNo;
     }
 
+    @JsonGetter("_id")
     public String getId() {
-        return id;
+        return _id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this._id = id;
     }
 
     public String getName() {
