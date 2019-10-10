@@ -7,12 +7,15 @@ import benefitBountyService.models.User;
 import benefitBountyService.services.ProjectService;
 import benefitBountyService.utils.Constants;
 import benefitBountyService.utils.MongoDbUtils;
+import com.mongodb.BasicDBObject;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -170,5 +173,46 @@ public class ProjectRepositoryImpl implements ProjectRepository {
             updated = 0;
         }
         return updated;
+    }
+
+    @Override
+    public List<Document> getProjectDetails(String status){
+
+
+
+        List<Project> mongoTasks = new ArrayList<>();
+        LookupOperation apprLookupOp = MongoDbUtils.getLookupOperation("users", "task_info.approver", "_id", "task_info.approver_info");
+
+        LookupOperation taskLookupOp = MongoDbUtils.getLookupOperation("tasks", "_id", "projectId", "task_info");
+
+        LookupOperation volLookupOp = MongoDbUtils.getLookupOperation("users", "task_info.volunteers", "_id", "task_info.volunteer_info");
+        LookupOperation sthLookupOp = MongoDbUtils.getLookupOperation("users", "stakeholder", "_id", "task_info.stakeholder_info");
+
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("status").is(status)),
+              // Aggregation.match(Criteria.where("startDate").gte(java.util.Calendar.getInstance().)),//startDate
+              //  Aggregation.match(Criteria.where("endDate").lte(new Date("2019-10-30T18:30:00.000+0000"))),//endDate
+                /*apprLookupOp,S
+                Aggregation.unwind("$approver_info"),*/
+                taskLookupOp,
+                Aggregation.unwind("$task_info"),
+//                Aggregation.replaceRoot().withValueOf(ObjectOperators.valueOf("task_info").mergeWith(Aggregation.ROOT)),
+//                Aggregation.replaceRoot().withValueOf(Aggregation.ROOT),
+                apprLookupOp,
+                Aggregation.unwind("$task_info.approver_info"),
+                volLookupOp,
+                sthLookupOp,
+                Aggregation.group("_id","name","areaOfEngagement","startDate","endDate","budget","corporate","location").push(new BasicDBObject("task_info", "$task_info")
+                ).as("tasks")
+
+                //       Aggregation.bucket("$_id")
+                /*Aggregation.unwind("$volunteers"),
+                volLookupOp,
+                Aggregation.unwind("$volunteer_info")*/
+        );
+
+        List<Document> mongoDocs = mongoTemplate.aggregate(agg, "projects", Document.class).getMappedResults();
+
+        return mongoDocs;
     }
 }

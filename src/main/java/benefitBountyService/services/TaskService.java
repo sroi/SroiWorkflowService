@@ -3,7 +3,6 @@ package benefitBountyService.services;
 import benefitBountyService.dao.TaskRepository;
 import benefitBountyService.models.Task;
 import benefitBountyService.models.User;
-import benefitBountyService.models.dtos.PTUserTO;
 import benefitBountyService.utils.Constants;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;

@@ -9,6 +9,7 @@ import benefitBountyService.models.dtos.PTUserTO;
 import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.utils.Constants;
 import com.mongodb.MongoException;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -380,5 +381,9 @@ public class ProjectService {
 
     public List<Project> getAllProjects() {
         return projectRepository.getAllProjects();
+    }
+
+    public List<Document> getProjectDetails(String status) {
+        return projectRepository.getProjectDetails(status);
     }
 }

@@ -3,6 +3,7 @@ package benefitBountyService.controllers;
 import benefitBountyService.models.Project;
 import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.services.ProjectService;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +83,12 @@ public class ProjectController {
     @PostMapping(value = "/showall")
     public List<Project> getAll(){
         return projectService.getAllProjects();
+    }
+
+    @GetMapping(value = "/allTasks")
+    public List<Document> get(@RequestParam("status") String status) {
+        List<Document> projects = projectService.getProjectDetails(status);
+        return projects;
     }
 
 }
