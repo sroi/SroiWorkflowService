@@ -138,7 +138,7 @@ public class TaskService {
         Task task = null;
         String apprId = null;
         ObjectId approver = null;
-        List<String> volunteers = null;
+        List<ObjectId> volunteers = null;
 
         Map<String, User> userMap = null;
         if (taskTO.getApprover_info() != null || (taskTO.getVols_info().size() > 0)) {
@@ -147,7 +147,7 @@ public class TaskService {
                 userMap = users.stream().collect(Collectors.toMap(User::get_id, user -> user));
             }
             apprId = checkAndSaveApprover(taskTO, userMap);
-            if (ObjectId.isValid(apprId)) {
+            if (apprId != null && ObjectId.isValid(apprId)) {
                 approver = new ObjectId(apprId);
             } else {
                 approver = null;
@@ -170,7 +170,7 @@ public class TaskService {
         Task task = null;
         String apprId = null;
         ObjectId approver = null;
-        List<String> volunteers = null;
+        List<ObjectId> volunteers = null;
 
         Task existingTask = taskRepository.findById(taskTO.getTaskId());
         if (existingTask != null) {
@@ -207,7 +207,7 @@ public class TaskService {
 
     private String checkAndSaveApprover(Task taskTO, Map<String, User> userMap) {
         String apprId = null;
-        if (taskTO.getApprover() != null) {
+        if (taskTO.getApprover_info() != null) {
             User appr = null;
             if (!StringUtils.isEmpty(taskTO.getApprover_info().get_id())) {
                 appr = userMap.get(taskTO.getApprover_info().get_id());
@@ -221,7 +221,7 @@ public class TaskService {
                         logger.info(errMsg);
                         throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
                     }
-//                    appr = userService.saveApprover(taskTO.getApprover());
+                    appr = userService.saveApprover(taskTO.getApprover_info());
                     apprId = appr.get_id();
                 } else {
                     logger.info("Email Id must be provided for Approver for Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
@@ -233,15 +233,15 @@ public class TaskService {
         return apprId;
     }
 
-    private List<String> checkAndSaveVolunteers(Task taskTO, Map<String, User> userMap) {
-        List<String> volunteers = new ArrayList<>();
+    private List<ObjectId> checkAndSaveVolunteers(Task taskTO, Map<String, User> userMap) {
+        List<ObjectId> volunteers = new ArrayList<>();
 
-        if(taskTO.getVolunteers().size() > 0) {
+        if(taskTO.getVols_info().size() > 0 && taskTO.getVols_info().get(0) != null) {
             List<User> volunteersWithId = null, volunteersWOId = null;
             List<User> validNewVols = null;
-            List<String> existingVols = null, newVolsId = null;
+            List<ObjectId> existingVols = null, newVolsId = null;
             volunteersWithId = taskTO.getVols_info().parallelStream().filter(vol -> !StringUtils.isEmpty(vol.get_id())).collect(Collectors.toList());
-            existingVols = volunteersWithId.stream().filter(vol -> userMap.get(vol.get_id()) != null).map(vol -> vol.get_id()).collect(Collectors.toList());
+            existingVols = volunteersWithId.stream().filter(vol -> userMap.get(vol.get_id()) != null).map(vol -> vol.get_id()).map(str -> new ObjectId(str)).collect(Collectors.toList());
             volunteers.addAll(existingVols);
 
             volunteersWOId = taskTO.getVols_info().parallelStream().filter(vol -> StringUtils.isEmpty(vol.get_id())).collect(Collectors.toList());
@@ -257,14 +257,14 @@ public class TaskService {
 
         } else {
             volunteers = null;
-            logger.info("Approver details are not provided while creating Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
+            logger.info("Volunteers details are not provided while creating Task: " + taskTO.getName() + " for Project: " + taskTO.getProjectId());
         }
         return volunteers;
     }
 
-    private List<String> saveVolunteers(List<User> vols) {
+    private List<ObjectId> saveVolunteers(List<User> vols) {
         List<User> newVols = userService.saveVolunteers(vols);
-        return newVols.parallelStream().map(User::get_id).collect(Collectors.toList());
+        return newVols.parallelStream().map(User::get_id).map(str -> new ObjectId(str)).collect(Collectors.toList());
     }
 
     public int changeTaskStatus(String taskId, String role, String status, String comments, String timeSpent) {

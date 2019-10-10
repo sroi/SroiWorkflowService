@@ -40,7 +40,7 @@ public class Task {
     private ObjectId approver;
 
     @JsonIgnore
-    private List<String> volunteers = new ArrayList<>();
+    private List<ObjectId> volunteers = new ArrayList<>();
 
     private String status;
 
@@ -75,7 +75,7 @@ public class Task {
 
 //    @BsonCreator
     public Task(ObjectId taskId, String name, String description, ObjectId projectId, String activityLabel, Date startDate, Date endDate, String location,
-                ObjectId approver, List<String> volunteers, String status, String created_by, Date created_on, String updated_by, Date updated_on) {
+                ObjectId approver, List<ObjectId> volunteers, String status, String created_by, Date created_on, String updated_by, Date updated_on) {
         this.taskId = taskId;
         this.name = name;
         this.description = description;
@@ -165,11 +165,11 @@ public class Task {
         this.approver = approver;
     }
 
-    public List<String> getVolunteers() {
+    public List<ObjectId> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(List<String> volunteers) {
+    public void setVolunteers(List<ObjectId> volunteers) {
         this.volunteers = volunteers;
     }
 

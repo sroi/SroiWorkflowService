@@ -240,7 +240,7 @@ public class ProjectService {
         loggedInUser.setName("sawan nai");
         loggedInUser.set_id(new ObjectId("5d9984b61c9d440000d024be"));
 
-        try {
+//        try {
             if (ObjectId.isValid(projectId)) {
                 if (role.equalsIgnoreCase(Constants.ROLES.STAKEHOLDER.toString())) {
                     updateStatusForStakeholder(loggedInUser, projectId, status, role, comment, rating);
@@ -254,9 +254,7 @@ public class ProjectService {
             } else {
                 throwInvalidError(projectId);
             }
-        } catch (Exception e) {
-            throwProjectNotFound(projectId);
-        }
+//        }
         return updated;
     }
 

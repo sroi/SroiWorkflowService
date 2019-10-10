@@ -74,10 +74,17 @@ public class UserService {
         return saveUser(userTo, sh);
     }
 
-    public User saveApprover(PTUserTO appr) {
+    /*public User saveApprover(PTUserTO appr) {
         User apvr = new User();
         apvr.setApprover("Y");
         return saveUser(appr, apvr);
+    }*/
+
+    public User saveApprover(User appr) {
+//        User apvr = new User();
+        appr.setApprover("Y");
+        appr.setUserId(appr.getEmail());
+        return saveUser(appr);
     }
 
     public User saveOrUpdateUser(User user){
