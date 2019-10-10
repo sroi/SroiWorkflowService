@@ -1,10 +1,10 @@
 package benefitBountyService.dao;
 
 import benefitBountyService.models.Project;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.bson.Document;
 
+import java.lang.annotation.Documented;
 import java.util.List;
-import java.util.Optional;
 
 public interface ProjectRepository {
 
@@ -15,4 +15,6 @@ public interface ProjectRepository {
     void deleteById(String projectId);
 
     Project save(Project prj);
+
+    List<Document> getProjectDetails();
 }

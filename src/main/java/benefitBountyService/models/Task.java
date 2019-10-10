@@ -124,6 +124,11 @@ public class Task {
         this.projectId = projectId;
     }
 
+
+    public void setProjectId(String projectId) {
+        this.projectId = new ObjectId(projectId);
+    }
+
     public String getActivityLabel() {
         return activityLabel;
     }

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "projects")
 public class Project {
@@ -37,6 +38,7 @@ public class Project {
 	@Field("updated_by")
 	private String updatedBy;
 	//private IAdmin admin;
+	private List<Task> tasks;
 
 
 	public Project(ObjectId projectId, String name, String areaOfEngagement, String summary, Date startDate, Date endDate, Double budget, String associatedCorporateEntity,
@@ -196,6 +198,14 @@ public class Project {
 		this.updatedBy = updatedBy;
 	}
 
+	public List<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(List<Task> tasks) {
+		this.tasks = tasks;
+	}
+
 	@Override
 	public String toString() {
 		return "Project{" +
@@ -214,6 +224,7 @@ public class Project {
 				", rating='" + rating + '\'' +
 				", createdBy='" + createdBy + '\'' +
 				", createdOn='" + createdOn + '\'' +
+				", tasks='" + tasks.toString() + '\'' +
 				'}';
 	}
 }

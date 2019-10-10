@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.bson.Document;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -256,5 +257,9 @@ public class ProjectService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errMsg, e);
         }
         return updated;
+    }
+
+    public List<Document> getProjectDetails() {
+        return projectRepository.getProjectDetails();
     }
 }

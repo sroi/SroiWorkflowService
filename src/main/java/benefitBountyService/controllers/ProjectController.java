@@ -1,12 +1,14 @@
 package benefitBountyService.controllers;
 
 import benefitBountyService.exceptions.ResourceNotFoundException;
+import benefitBountyService.models.Project;
 import benefitBountyService.models.dtos.ProjectTO;
 import benefitBountyService.services.ProjectService;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.bson.Document;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,6 +43,12 @@ public class ProjectController {
 	@RequestMapping(value = "/all" , method=RequestMethod.GET)
 	public List<ProjectTO> getProjects(@RequestParam("user_id") String userId, @RequestParam("Role") String role) {
         List<ProjectTO> projects = projectService.getProjects(userId, role);
+        return projects;
+    }
+
+    @RequestMapping(value = "/allTasks" , method=RequestMethod.GET)
+    public List<Document> get() {
+        List<Document> projects = projectService.getProjectDetails();
         return projects;
     }
 
