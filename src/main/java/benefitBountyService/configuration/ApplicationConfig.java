@@ -1,13 +1,7 @@
 package benefitBountyService.configuration;
 
-import benefitBountyService.dao.FileRepository;
-import benefitBountyService.dao.ProjectRepository;
-import benefitBountyService.dao.TaskRepository;
-import benefitBountyService.dao.UserRepository;
-import benefitBountyService.dao.impl.FileRepositoryImpl;
-import benefitBountyService.dao.impl.ProjectRepositoryImpl;
-import benefitBountyService.dao.impl.TaskRepositoryImpl;
-import benefitBountyService.dao.impl.UserRepositoryImpl;
+import benefitBountyService.dao.*;
+import benefitBountyService.dao.impl.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,4 +28,8 @@ public class ApplicationConfig {
         return new FileRepositoryImpl();
     }
 
+    @Bean(name="sroiCalcRepository")
+    public SroiCalcRepository getSroiCalcRepository(){
+        return new SroiCalcRepositoryImpl();
+    }
 }
