@@ -3,7 +3,7 @@ package benefitBountyService.models.dtos;
 public class LoginTO {
     private String username;
     private String password;
-    private String role;
+//    private String role;
 
     public String getUsername() {
         return username;
@@ -21,11 +21,11 @@ public class LoginTO {
         this.password = password;
     }
 
-    public String getRole() {
+    /*public String getRole() {
         return role;
     }
 
     public void setRole(String role) {
         this.role = role;
-    }
+    }*/
 }

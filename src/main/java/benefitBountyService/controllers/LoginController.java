@@ -1,6 +1,7 @@
 package benefitBountyService.controllers;
 
 
+import benefitBountyService.models.User;
 import benefitBountyService.models.dtos.LoginTO;
 import benefitBountyService.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,13 @@ public class LoginController {
     public int login(@RequestBody LoginTO loginTO){
         int validLogin = -1;
         validLogin = loginService.login(loginTO);
+        return validLogin;
+    }
+
+    @RequestMapping(value = "/auth" , method= RequestMethod.POST)
+    public User newLogin(@RequestBody LoginTO loginTO){
+        User validLogin = null;
+        validLogin = loginService.newLogin(loginTO);
         return validLogin;
     }
 }

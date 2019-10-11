@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class LoginService {
@@ -40,9 +39,9 @@ public class LoginService {
             if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
                 logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");
-            } else if (!isValidRole(login.getRole(), user)) {
-                logger.info("User '"+login.getUsername()+"' is not authorized because of wrong role.");
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"3");
+//            } else if (!isValidRole(login.getRole(), user)) {
+//                logger.info("User '"+login.getUsername()+"' is not authorized because of wrong role.");
+//                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"3");
             } else {
                 logger.info("User '"+login.getUsername()+"' is authorized");
             }
@@ -51,6 +50,33 @@ public class LoginService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "1", ex);
         }
         return loginStatus;
+    }
+
+    public User newLogin(LoginTO login) {
+        Integer loginStatus = -1;
+        User user = null;
+//        try {
+            user = userRepository.findByUserId(login.getUsername());
+//            User user = optUser.get();
+        if (user == null) {
+            String errMsg = "User doesn't exist";
+            logger.info(errMsg);
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, errMsg);
+        }
+            if (!(user.getUserId().equals(login.getUsername()) && user.getPassword().equals(login.getPassword()))){
+                logger.info("User '"+login.getUsername()+"' is not authorized because of wrong password.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "2");
+            /*} else if (!isValidRole(login.getRole(), user)) {
+                logger.info("User '"+login.getUsername()+"' is not authorized because of wrong role.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"3");*/
+            } else {
+                logger.info("User '"+login.getUsername()+"' is authorized");
+            }
+        /*} catch (NoSuchElementException ex) {
+            logger.info("User '"+login.getUsername()+"' is not authorized because of wrong Username.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "1", ex);
+        }*/
+        return user;
     }
 
     public boolean isValidRole(String role, User user) {
