@@ -20,8 +20,16 @@ public class SroiCalcController {
     }
 
     @GetMapping(value = "/bystep")
-    public SroiCalc getSROIDataByStep(@RequestParam("pid") String projectId, @RequestParam("step") String stepId) {
+    public SroiCalc getSROIDataByStep(@RequestParam("pid") String projectId,
+                                      @RequestParam("step") String stepId) {
         SroiCalc calc = sroiCalcService.getProjectSroiByStep(projectId, stepId);
+        return calc;
+    }
+
+    @PostMapping(value = "/save")
+    public SroiCalc saveSroiData(@RequestBody SroiCalc sroiCalc,
+                                 @RequestParam("step") String stepId) {
+        SroiCalc calc = sroiCalcService.saveProjectSroiData(sroiCalc, stepId);
         return calc;
     }
 }

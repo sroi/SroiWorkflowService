@@ -1,6 +1,7 @@
 package benefitBountyService.services;
 
 import benefitBountyService.dao.SroiCalcRepository;
+import benefitBountyService.models.User;
 import benefitBountyService.models.sroi.SroiCalc;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.stream.Stream;
 
 @Service
@@ -39,5 +41,31 @@ public class SroiCalcService {
         }
         SroiCalc calc = sroiCalcRepository.getSroiDataForProjectByStep(projectId, stepId);
         return calc;
+    }
+
+    public SroiCalc saveProjectSroiData(SroiCalc sroiCalc, String stepId) {
+        SroiCalc saved = null;
+        //To get it from session
+        User loggedInUser = new User();
+
+        SroiCalc calc = sroiCalcRepository.getSroiDataForProjectByStep(sroiCalc.getProjectId(), stepId);
+        if (calc != null) {
+
+        } else {
+            saved = createProjectSroiData(sroiCalc, stepId);
+        }
+        return saved;
+    }
+
+    public SroiCalc createProjectSroiData(SroiCalc sroiCalc, String stepId) {
+        //To get it from session
+        User loggedInUser = new User();
+        sroiCalc.setCreated_by(loggedInUser.getUserId());
+        sroiCalc.setCreated_on(new Date());
+        sroiCalc.setUpdated_by(loggedInUser.getUserId());
+        sroiCalc.setUpdated_on(new Date());
+
+        SroiCalc savedSroi = sroiCalcRepository.saveProjectSroiData(sroiCalc, stepId);
+        return savedSroi;
     }
 }

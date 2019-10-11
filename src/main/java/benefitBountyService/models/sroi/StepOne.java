@@ -20,8 +20,8 @@ public class StepOne {
         this._id = _id;
     }*/
 
-    public ObjectId getRowId() {
-        return rowId;
+    public String getRowId() {
+        return rowId != null ? rowId.toString() : null;
     }
 
     public void setRowId(ObjectId rowId) {

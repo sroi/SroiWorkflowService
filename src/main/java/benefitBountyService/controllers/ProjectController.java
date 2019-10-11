@@ -85,7 +85,7 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
-    @GetMapping(value = "/allTasks")
+    @GetMapping(value = "/report")
     public List<Document> get(@RequestParam("status") String status) {
         List<Document> projects = projectService.getProjectDetails(status);
         return projects;

@@ -10,8 +10,8 @@ public class StepTwo {
     private String stakeholder;
     private String goals;
 
-    public ObjectId getRowId() {
-        return rowId;
+    public String getRowId() {
+        return rowId != null ? rowId.toString() : null;
     }
 
     public void setRowId(ObjectId rowId) {
