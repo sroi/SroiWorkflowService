@@ -3,14 +3,15 @@ package benefitBountyService.models.sroi;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class StepOne extends Step {
+public class StepOne {
 
     @Field("_id")
     private ObjectId rowId;
     private String scope;
     private String workplan;
-    private String resources;
+    private String resource;
     private String timeline;
+    private String proj_id;
 
     /*public ObjectId get_id() {
         return _id;
@@ -20,8 +21,16 @@ public class StepOne extends Step {
         this._id = _id;
     }*/
 
-    public ObjectId getRowId() {
-        return rowId;
+    public String getProj_id() {
+        return proj_id;
+    }
+
+    public void setProj_id(String proj_id) {
+        this.proj_id = proj_id;
+    }
+
+    public String getRowId() {
+        return rowId != null ? rowId.toString() : null;
     }
 
     public void setRowId(ObjectId rowId) {
@@ -44,12 +53,12 @@ public class StepOne extends Step {
         this.workplan = workplan;
     }
 
-    public String getResources() {
-        return resources;
+    public String getResource() {
+        return resource;
     }
 
-    public void setResources(String resources) {
-        this.resources = resources;
+    public void setResource(String resources) {
+        this.resource = resources;
     }
 
     public String getTimeline() {

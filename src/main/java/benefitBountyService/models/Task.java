@@ -3,7 +3,6 @@ package benefitBountyService.models;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -263,7 +262,11 @@ public class Task {
 
     @JsonGetter("duration")
     public String duration() {
-        String duration = String.valueOf(((endDate.getTime() - startDate.getTime())/3600000));
+        String duration = null;
+        if (endDate != null && startDate != null) {
+            duration = String.valueOf(((endDate.getTime() - startDate.getTime())/3600000));
+            return duration;
+        }
         return duration;
     }
 

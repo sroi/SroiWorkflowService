@@ -246,6 +246,7 @@ public class TaskService {
 
             volunteersWOId = taskTO.getVols_info().parallelStream().filter(vol -> StringUtils.isEmpty(vol.get_id())).collect(Collectors.toList());
             validNewVols = volunteersWOId.stream().filter(vol -> !StringUtils.isEmpty(vol.getEmail())).collect(Collectors.toList());
+            validNewVols.stream().forEach(vol -> vol.setPassword("GGG990"));
             if (validNewVols.size() == volunteersWOId.size()) {
                 newVolsId =  saveVolunteers(validNewVols);
                 volunteers.addAll(newVolsId);

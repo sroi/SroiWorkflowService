@@ -202,7 +202,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
                 Aggregation.unwind("$task_info.approver_info"),
                 volLookupOp,
                 sthLookupOp,
-                Aggregation.group("_id","name","areaOfEngagement","startDate","endDate","budget","corporate","location").push(new BasicDBObject("task_info", "$task_info")
+                Aggregation.group("_id","name","areaOfEngagement","startDate","endDate","budget","corporate","location","status","rating").push(new BasicDBObject("task_info", "$task_info")
                 ).as("tasks")
 
                 //       Aggregation.bucket("$_id")
