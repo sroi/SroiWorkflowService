@@ -3,6 +3,7 @@ package benefitBountyService.services;
 import benefitBountyService.dao.SroiCalcRepository;
 import benefitBountyService.models.User;
 import benefitBountyService.models.sroi.SroiCalc;
+import benefitBountyService.models.sroi.StepOne;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,5 +83,10 @@ public class SroiCalcService {
 
         SroiCalc savedSroi = sroiCalcRepository.saveProjectSroiData(sroiCalc, stepId);
         return savedSroi;
+    }
+
+    public StepOne saveStepOneSroiData(StepOne one) {
+        StepOne one1 = sroiCalcRepository.saveStepOneData(one);
+        return one1;
     }
 }

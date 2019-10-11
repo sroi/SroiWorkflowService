@@ -11,6 +11,7 @@ public class StepOne {
     private String workplan;
     private String resource;
     private String timeline;
+    private String proj_id;
 
     /*public ObjectId get_id() {
         return _id;
@@ -19,6 +20,14 @@ public class StepOne {
     public void set_id(ObjectId _id) {
         this._id = _id;
     }*/
+
+    public String getProj_id() {
+        return proj_id;
+    }
+
+    public void setProj_id(String proj_id) {
+        this.proj_id = proj_id;
+    }
 
     public String getRowId() {
         return rowId != null ? rowId.toString() : null;

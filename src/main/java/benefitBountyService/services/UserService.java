@@ -84,6 +84,7 @@ public class UserService {
 //        User apvr = new User();
         appr.setApprover("Y");
         appr.setUserId(appr.getEmail());
+        appr.setPassword("GGG990");
         return saveUser(appr);
     }
 

@@ -1,6 +1,7 @@
 package benefitBountyService.controllers;
 
 import benefitBountyService.models.sroi.SroiCalc;
+import benefitBountyService.models.sroi.StepOne;
 import benefitBountyService.services.SroiCalcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,4 +33,12 @@ public class SroiCalcController {
         SroiCalc calc = sroiCalcService.saveProjectSroiData(sroiCalc, stepId);
         return calc;
     }
+
+    @PostMapping(value = "/saveStep1")
+    public StepOne saveStepOneSroiData(@RequestBody StepOne sroiCalc) {
+        StepOne calc = sroiCalcService.saveStepOneSroiData(sroiCalc);
+        return calc;
+    }
+
+
 }

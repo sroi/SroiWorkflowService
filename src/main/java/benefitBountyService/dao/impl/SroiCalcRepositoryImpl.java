@@ -2,6 +2,7 @@ package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.SroiCalcRepository;
 import benefitBountyService.models.sroi.SroiCalc;
+import benefitBountyService.models.sroi.StepOne;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -63,5 +64,11 @@ public class SroiCalcRepositoryImpl implements SroiCalcRepository {
             return stepId;
         }
 
+    }
+
+    @Override
+    public StepOne saveStepOneData(StepOne one) {
+        StepOne saved = mongoTemplate.save(one, collectionName);
+        return saved;
     }
 }
