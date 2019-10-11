@@ -3,20 +3,12 @@ package benefitBountyService.models.sroi;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class StepTwo extends Step {
+public class StepTwo {
 
     @Field("_id")
     private ObjectId rowId;
     private String stakeholder;
     private String goals;
-
-    /*public ObjectId get_id() {
-        return _id;
-    }
-
-    public void set_id(ObjectId _id) {
-        this._id = _id;
-    }*/
 
     public ObjectId getRowId() {
         return rowId;

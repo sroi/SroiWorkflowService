@@ -1,7 +1,7 @@
 package benefitBountyService.dao.impl;
 
 import benefitBountyService.dao.SroiCalcRepository;
-import benefitBountyService.models.sroi.SROICalc;
+import benefitBountyService.models.sroi.SroiCalc;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,10 +17,17 @@ public class SroiCalcRepositoryImpl implements SroiCalcRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public SROICalc getSroiDataForProject(String projId) {
+    public SroiCalc getSroiDataForProject(String projId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("proj_id").is(new ObjectId(projId)));
-        SROICalc calc = mongoTemplate.find(query, SROICalc.class, collectionName).get(0);
+        SroiCalc calc = mongoTemplate.find(query, SroiCalc.class, collectionName).get(0);
         return calc;
+    }
+
+    @Override
+    public SroiCalc getSroiDataForProjectByStep(String projectId, String stepId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("proj_id").is(new ObjectId(projectId)));
+        return null;
     }
 }

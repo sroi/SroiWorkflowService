@@ -3,13 +3,13 @@ package benefitBountyService.models.sroi;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class StepOne extends Step {
+public class StepOne {
 
     @Field("_id")
     private ObjectId rowId;
     private String scope;
     private String workplan;
-    private String resources;
+    private String resource;
     private String timeline;
 
     /*public ObjectId get_id() {
@@ -44,12 +44,12 @@ public class StepOne extends Step {
         this.workplan = workplan;
     }
 
-    public String getResources() {
-        return resources;
+    public String getResource() {
+        return resource;
     }
 
-    public void setResources(String resources) {
-        this.resources = resources;
+    public void setResource(String resources) {
+        this.resource = resources;
     }
 
     public String getTimeline() {

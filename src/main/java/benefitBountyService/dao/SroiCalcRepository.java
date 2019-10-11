@@ -1,7 +1,9 @@
 package benefitBountyService.dao;
 
-import benefitBountyService.models.sroi.SROICalc;
+import benefitBountyService.models.sroi.SroiCalc;
 
 public interface SroiCalcRepository {
-    SROICalc getSroiDataForProject(String projId);
+    SroiCalc getSroiDataForProject(String projId);
+
+    SroiCalc getSroiDataForProjectByStep(String projectId, String stepId);
 }
