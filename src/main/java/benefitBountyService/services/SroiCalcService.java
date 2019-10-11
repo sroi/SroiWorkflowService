@@ -52,18 +52,33 @@ public class SroiCalcService {
         if (calc != null) {
 
         } else {
-            saved = createProjectSroiData(sroiCalc, stepId);
+
+            saved = createProjectSroiData(sroiCalc, stepId, calc);
         }
         return saved;
     }
 
-    public SroiCalc createProjectSroiData(SroiCalc sroiCalc, String stepId) {
+    public SroiCalc createProjectSroiData(SroiCalc sroiCalc, String stepId, SroiCalc dbCalc) {
         //To get it from session
         User loggedInUser = new User();
         sroiCalc.setCreated_by(loggedInUser.getUserId());
         sroiCalc.setCreated_on(new Date());
         sroiCalc.setUpdated_by(loggedInUser.getUserId());
         sroiCalc.setUpdated_on(new Date());
+        switch (Integer.parseInt(stepId)) {
+            case 1: sroiCalc.getStepOne().setRowId(ObjectId.get()); break;
+            case 2: sroiCalc.getStepTwo().stream().forEach(data -> {
+                        if (data.getRowId() != null) {
+                            data.setRowId(ObjectId.get());
+                        }
+                    });
+            if (dbCalc.getStepTwo() != null) {
+                dbCalc.getStepTwo().addAll(sroiCalc.getStepTwo());
+                sroiCalc.setStepTwo(dbCalc.getStepTwo());
+            }
+
+            default: logger.info("Invalid step is provided.."); break;
+        }
 
         SroiCalc savedSroi = sroiCalcRepository.saveProjectSroiData(sroiCalc, stepId);
         return savedSroi;
