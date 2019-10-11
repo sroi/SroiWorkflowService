@@ -80,7 +80,7 @@ public class ProjectController {
         return projectService.updateProjectStatus(projectId, status, role, comment, rating);
     }
 
-    @PostMapping(value = "/showall")
+    @GetMapping(value = "/showall")
     public List<Project> getAll(){
         return projectService.getAllProjects();
     }
