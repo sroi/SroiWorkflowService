@@ -28,9 +28,9 @@ public class FileDatabaseController {
     }
 
     //http://localhost:8080/file/display/5d9ca3ca99097f2eb5dfcd0a
-    @GetMapping(value = "/display/{id}")
-    public ResponseEntity<Resource>  getFilebyFileId(@PathVariable("id") String fileId) throws IllegalStateException, IOException {
-        return fileDatabaseService.getFileByFileId(fileId);
+    @GetMapping(value = "/display/{id}/{name}")
+    public ResponseEntity<Resource>  getFilebyFileId(@PathVariable("id") String fileId,@PathVariable("name") String fileName) throws IllegalStateException, IOException {
+        return fileDatabaseService.getFileByFileId(fileId,fileName);
     }
 
     //http://localhost:8080/file/getByTask/harshbhau (taskId = harshbhau)

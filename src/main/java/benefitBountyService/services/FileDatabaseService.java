@@ -73,13 +73,15 @@ public class FileDatabaseService {
      * @throws IllegalStateException
      * @throws IOException
      */
-    public ResponseEntity<Resource> getFileByFileId(@PathVariable("id") String fileId) throws IllegalStateException, IOException {
+    public ResponseEntity<Resource> getFileByFileId(@PathVariable("id") String fileId,@PathVariable("name") String fileName) throws IllegalStateException, IOException {
         GridFSFile file =
                 operations.findOne(Query.query(Criteria.where("_id").is(fileId)));
+        System.out.println(file.getFilename());
 
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(file.getMetadata().getString("_contentType")))
                 .contentLength(file.getLength())
+                .header("Content-Disposition","inline;filename="+fileName)
                 .body(operations.getResource(file));
     }
 

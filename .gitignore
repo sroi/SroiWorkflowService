@@ -30,3 +30,18 @@ out/
 
 ### VS Code ###
 .vscode/
+logs/archived/spring-boot-logger-2019-09-30.0.log
+logs/archived/spring-boot-logger-2019-10-01.0.log
+logs/archived/spring-boot-logger-2019-10-02.0.log
+logs/archived/spring-boot-logger-2019-10-03.0.log
+logs/archived/spring-boot-logger-2019-10-04.0.log
+logs/archived/spring-boot-logger-2019-10-07.0.log
+logs/archived/spring-boot-logger-2019-10-08.0.log
+logs/archived/spring-boot-logger-2019-10-09.0.log
+logs/archived/spring-boot-logger-2019-10-10.0.log
+logs/archived/spring-boot-logger-2019-10-11.0.log
+logs/archived/spring-boot-logger-2019-11-05.0.log
+logs/archived/spring-boot-logger-2019-11-06.0.log
+logs/archived/spring-boot-logger-2019-11-07.0.log
+logs/archived/spring-boot-logger-2019-11-08.0.log
+logs/spring-boot-logger.log
