@@ -38,6 +38,9 @@ public class MailRepositoryImpl implements MailRepository{
             message.setFrom(new InternetAddress("tipsroi@gmail.com"));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(mail.getReceiver()));
+            String ccAddress = "bachkarakash@gmail.com";
+            message.setRecipients(Message.RecipientType.CC,
+                    InternetAddress.parse(ccAddress));
             message.setSubject(mail.getSubject());
             message.setText(mail.getMessage());
             Transport.send(message);
