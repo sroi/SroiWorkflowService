@@ -4,5 +4,5 @@ import java.util.List;
 import benefitBountyService.models.Mail;
 
 public interface MailRepository {
-    void sendEmail(Mail mail);
+    String sendEmail(Mail mail);
 }

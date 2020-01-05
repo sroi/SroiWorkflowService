@@ -28,6 +28,9 @@ public class ApplicationConfig {
         return new FileRepositoryImpl();
     }
 
+    @Bean(name="mailRepository")
+    public MailRepository getMailRepository(){ return new MailRepositoryImpl(); }
+
     @Bean(name="sroiCalcRepository")
     public SroiCalcRepository getSroiCalcRepository(){
         return new SroiCalcRepositoryImpl();
